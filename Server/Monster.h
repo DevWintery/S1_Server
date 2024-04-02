@@ -30,9 +30,15 @@ public:
 	void SetDestPos(const FVector& destPos) { _destPos = destPos; }
 	virtual void SetPos(const FVector& pos) override;
 
+/*Detour Agent*/
+public:
+	void SetAgentIndex(int idx) { _agentIndex = idx; }
+	int GetAgentIndex() { return _agentIndex; }
+
+	FVector GetAgentPos();
+
 private:
 	void SetTarget(shared_ptr<Object> object) { _target = object; }
-	void ClearPath();
 
 private:
 	const uint64 MOVE_TICK = 40;
@@ -46,16 +52,7 @@ private:
 	uint64 nextWaitTickAfter = 0;
 
 private:
-	enum
-	{
-		MOVE_PATH_FORWARD = 1,
-		MOVE_PATH_BACKWARD = -1
-	};
-
 	FVector _destPos;
-	std::vector<FVector> _paths;
-	int _pathIndex = 1;
-	int _pathDirection = MOVE_PATH_FORWARD;
 	bool _wait = false;
 
 private:
@@ -66,5 +63,7 @@ private:
 
 	//TEMP
 	float _hp = 100.f;
+
+	int _agentIndex = -1;
 };
 

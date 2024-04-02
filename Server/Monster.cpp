@@ -67,6 +67,13 @@ void Monster::SetPos(const FVector& pos)
 	posInfo->set_z(pos.Z + 90.0f);
 }
 
+FVector Monster::GetAgentPos()
+{
+	const dtCrowdAgent* agent = NavigationSystem::GetInstance()->GetAgent(_agentIndex);
+
+	return Utils::RecastToUE5_Meter(FVector(agent->npos[0], agent->npos[1], agent->npos[2]));
+}
+
 void Monster::SetState(Protocol::MonsterState state)
 {
 	if (_state == state)
@@ -94,12 +101,6 @@ void Monster::SetState(Protocol::MonsterState state)
 
 
 	GRoom->DoAsync(&Room::HandleMonsterState, pkt);
-}
-
-void Monster::ClearPath()
-{
-	_pathIndex = 1;
-	_paths.clear();
 }
 
 void Monster::UpdateState()
@@ -150,6 +151,7 @@ void Monster::UpdateState()
 			{
 				//움직이기
 				_wait = false;
+				ReCalculateDestPos();
 				SetState(Protocol::MONSTER_STATE_MOVE);
 			}
 			else
@@ -162,6 +164,7 @@ void Monster::UpdateState()
 
 		if (_moveType == EMoveType::Move)
 		{
+			ReCalculateDestPos();
 			SetState(Protocol::MONSTER_STATE_MOVE);
 		}
 		else
@@ -189,64 +192,15 @@ void Monster::UpdateMove()
 	}
 	nextMoveTickAfter = GetTickCount64() + MOVE_TICK;
 
-	//경로 없으면
-	if (0 >= _paths.size())
-	{
-		ReCalculateDestPos(); //위치 정해주기
-	}
+	FVector agentPos = GetAgentPos();
 
-	FVector pathPos = _paths[_pathIndex];
-	pathPos.Z += 90.0f; //Mesh 높이 처리
-	FVector delta = pathPos - GetPosVector();
-	float distance = delta.Size();
-	float deltaTime = MOVE_TICK / 1000.f;
+	std::cout << "Agent pos : " << agentPos.X << ", " << agentPos.Y << ", " << agentPos.Z << std::endl;
 
-	float ratio = GetPos()->speed() * deltaTime / distance;
-	FVector targetPos = GetPosVector() + delta * ratio;
-
-	GetPos()->set_x(targetPos.X);
-	GetPos()->set_y(targetPos.Y);
-	GetPos()->set_z(targetPos.Z);
+	GetPos()->set_x(agentPos.X);
+	GetPos()->set_y(agentPos.Y);
+	GetPos()->set_z(agentPos.Z);
 
 	GRoom->DoAsync(&Room::HandleServerMove, GetPos());
-
-	if (GetPos()->speed() * deltaTime > distance)
-	{
-		_pathIndex++;
-
-		FVector pathLoc;
-		if (_pathIndex >= _paths.size())
-		{
-			pathLoc = _paths[_pathIndex - 1];
-		}
-		else
-		{
-			pathLoc = _paths[_pathIndex];
-		}
-		std::cout << "X : " << pathLoc.X << " Y : " << pathLoc.Y << " Z : " << pathLoc.Z << std::endl;
-
-		if (_pathIndex >= _paths.size())
-		{
-			ClearPath();
-
-			if (_moveMode == EMoveMode::Patrol)
-			{
-				std::cout << "[MonsterInfo] : Move complete, Recalculate dest path and wait " << WAIT_TIME / 1000 << "seconds" << std::endl;
-				nextWaitTickAfter = GetTickCount64() + WAIT_TIME;
-				_wait = true;
-			}
-			else
-			{
-				std::cout << "[MonsterInfo] : Move Complete " << std::endl;
-				SetState(Protocol::MONSTER_STATE_ATTACK);
-			}
-		}
-		else
-		{
-			FVector pathLoc = _paths[_pathIndex];
-			std::cout << "[MonsterInfo] : Move to next path X : " << pathLoc.X << " Y : " << pathLoc.Y << " Z : " << pathLoc.Z << std::endl;
-		}
-	}
 }
 
 void Monster::UpdateAttack()
@@ -285,10 +239,13 @@ void Monster::ReCalculateDestPos()
 
 	if (_moveMode == EMoveMode::Patrol)
 	{
-		_paths = NavigationSystem::GetInstance()->GetRandomPath(GetPosVector());
+		float maxRadius = 10.0f; // 몬스터가 이동할 수 있는 최대 반경
+		NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, maxRadius);
+
+		//_paths = NavigationSystem::GetInstance()->GetRandomPath(GetPosVector());
 	}
 	else
 	{
-		_paths = NavigationSystem::GetInstance()->GetPaths(GetPosVector(), _destPos);
+		//_paths = NavigationSystem::GetInstance()->GetPaths(GetPosVector(), _destPos);
 	}
 }

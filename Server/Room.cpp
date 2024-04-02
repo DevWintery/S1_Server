@@ -237,18 +237,6 @@ void Room::HandleAttack(Protocol::C_ATTACK pkt)
 
 void Room::HandleServerAttack(Protocol::S_ATTACK pkt, shared_ptr<Object> target)
 {
-	/*if (HitCheck(target, FVector(pkt.start_x(), pkt.start_y(), pkt.start_z()), FVector(pkt.end_x(), pkt.end_y(), pkt.end_z())))
-	{
-		Protocol::S_HIT hitPkt;
-
-		hitPkt.set_object_id(target->GetInfo()->object_id());
-
-		std::cout << "[Hit] : Object ID : " << target->GetInfo()->object_id() << std::endl;
-
-		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(hitPkt);
-		Broadcast(sendBuffer);
-	}*/
-
 	{
 		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 		Broadcast(sendBuffer);
@@ -285,6 +273,8 @@ void Room::HandleAnimationState(Protocol::C_ANIMATION_STATE pkt)
 
 void Room::UpdateRoom()
 {
+	NavigationSystem::GetInstance()->Update((float)DELTA_TIME / 1000.f);
+
 	for (const auto& object : _objects)
 	{
 		object.second->Update();
@@ -347,6 +337,9 @@ void Room::SpawnMonster(FVector spawnPos, FVector targetPos, EMoveMode moveMode)
 	monster->SetPos(spawnPos);
 	monster->SetDestPos(targetPos);
 
+	int _agentIndex = NavigationSystem::GetInstance()->AddAgent(Utils::UE5ToRecast_Meter(spawnPos));
+	monster->SetAgentIndex(_agentIndex);
+
 	AddObject(monster);
 }
 
@@ -355,14 +348,21 @@ void Room::MapInitialize()
 	Init = true;
 
 	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5321.f, -11277.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5321.f, -11277.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
 
-	SpawnMonster(FVector(-908.f, -10519.f, 1005.7f), FVector(-2580.f, -5360.f, 1005.7f));
-	SpawnMonster(FVector(-908.f, -9270.f, 1005.7f), FVector(-2580.f, -5360.f, 1005.7f));
+	//SpawnMonster(FVector(-908.f, -10519.f, 1005.7f), FVector(-2580.f, -5360.f, 1005.7f));
+	//SpawnMonster(FVector(-908.f, -9270.f, 1005.7f), FVector(-2580.f, -5360.f, 1005.7f));
 
-	SpawnMonster(FVector(-2159.f, -6507.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
-	SpawnMonster(FVector(-1835.f, -6507.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
-	SpawnMonster(FVector(-1835.f, -6125.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
+	//SpawnMonster(FVector(-2159.f, -6507.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
+	//SpawnMonster(FVector(-1835.f, -6507.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
+	//SpawnMonster(FVector(-1835.f, -6125.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
 
 	//Network Dev
 	//SpawnMonster(FVector(1550.f, -210.0f, 0.f), FVector(-970.0f, -210.0f, 0.f), EMoveMode::Rush);

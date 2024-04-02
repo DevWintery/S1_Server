@@ -3,6 +3,7 @@
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
 #include "DetourCommon.h"
+#include "DetourCrowd.h"
 
 namespace DetourUtil
 {
@@ -270,6 +271,24 @@ public:
 	std::vector<FVector> GetRandomPath();
 	std::vector<FVector> GetRandomPath(FVector start);
 	std::vector<FVector> GetPaths(FVector start, FVector end);
+
+
+/*Detour Crowd*/
+public:
+	void Update(float dt);
+	int AddAgent(const FVector& position);
+	void RemoveAgent(const int agentId);
+
+	void SetRandomDestination(int agentId, float maxRadius = 2.f);
+	const dtCrowdAgent* GetAgent(int agentId);
+
+private:
+	bool InitializeCrowd();
+	void CleanupCrowd();
+
+private:
+	const int MAX_AGENT = 50;
+	dtCrowd* m_crowd;
 
 private:
 	void SetRandomStart();

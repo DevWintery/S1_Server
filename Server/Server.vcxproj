@@ -164,6 +164,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\Libraries\Include\Detour\Source\DetourCrowd.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\Include\Detour\Source\DetourLocalBoundary.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\Libraries\Include\Detour\Source\DetourNavMesh.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -179,6 +187,22 @@
     <ClCompile Include="..\Libraries\Include\Detour\Source\DetourNode.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\Include\Detour\Source\DetourObstacleAvoidance.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\Include\Detour\Source\DetourPathCorridor.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\Include\Detour\Source\DetourPathQueue.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\Libraries\Include\Detour\Source\DetourProximityGrid.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Creature.cpp" />
     <ClCompile Include="NavigationSystem.cpp" />
@@ -217,11 +241,17 @@
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourAlloc.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourAssert.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourCommon.h" />
+    <ClInclude Include="..\Libraries\Include\Detour\Include\DetourCrowd.h" />
+    <ClInclude Include="..\Libraries\Include\Detour\Include\DetourLocalBoundary.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourMath.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourNavMesh.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourNavMeshBuilder.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourNavMeshQuery.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourNode.h" />
+    <ClInclude Include="..\Libraries\Include\Detour\Include\DetourObstacleAvoidance.h" />
+    <ClInclude Include="..\Libraries\Include\Detour\Include\DetourPathCorridor.h" />
+    <ClInclude Include="..\Libraries\Include\Detour\Include\DetourPathQueue.h" />
+    <ClInclude Include="..\Libraries\Include\Detour\Include\DetourProximityGrid.h" />
     <ClInclude Include="..\Libraries\Include\Detour\Include\DetourStatus.h" />
     <ClInclude Include="Creature.h" />
     <ClInclude Include="Define.h" />

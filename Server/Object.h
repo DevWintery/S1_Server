@@ -12,7 +12,7 @@ public:
 	Protocol::PosInfo* GetPos() { return posInfo; }
 	Protocol::ObjectInfo* GetInfo() { return objectInfo; }
 
-	const FVector GetPosVector();
+	virtual const FVector GetPosVector();
 	virtual void SetPos(const FVector& pos);
 
 public:

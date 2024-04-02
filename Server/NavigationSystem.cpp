@@ -12,6 +12,8 @@ void NavigationSystem::Init(string binName)
 	}
 	m_navQuery = dtAllocNavMeshQuery();
 	m_navQuery->init(m_navMesh, 2048);
+
+	InitializeCrowd();
 }
 
 void NavigationSystem::ReCalculate()
@@ -257,6 +259,117 @@ std::vector<FVector> NavigationSystem::GetPaths(FVector start, FVector end)
 	}
 
 	return v;
+}
+
+void NavigationSystem::Update(float dt)
+{
+	if (m_crowd)
+	{
+		m_crowd->update(dt, nullptr);
+		// Update agent positions or other state based on the crowd update.
+	}
+}
+
+int NavigationSystem::AddAgent(const FVector& position)
+{
+	if (!m_crowd) return -1;
+
+	/*
+		radius: 에이전트의 반지름입니다. 이 값은 에이전트가 다른 에이전트나 장애물을 회피하는 데 사용됩니다.
+		height: 에이전트의 높이입니다. 장애물을 넘거나 통과 가능 여부를 판단하는 데 사용됩니다.
+		maxAcceleration: 에이전트의 최대 가속도입니다. 에이전트가 얼마나 빨리 가속할 수 있는지를 결정합니다.
+		maxSpeed: 에이전트의 최대 속도입니다. 에이전트가 이동할 수 있는 최대 속도를 결정합니다.
+		collisionQueryRange: 충돌 탐지 범위입니다. 에이전트가 주변의 다른 에이전트나 장애물을 얼마나 멀리까지 감지할 수 있는지를 결정합니다.
+		pathOptimizationRange: 경로 최적화 범위입니다. 에이전트가 얼마나 멀리 떨어진 경로를 최적화할 수 있는지를 결정합니다.
+		updateFlags: 에이전트의 이동 및 회피 동작을 결정하는 플래그 집합입니다. 이 플래그는 회전 예측, 시각 최적화, 위상 최적화, 장애물 회피 등을 포함할 수 있습니다.
+		obstacleAvoidanceType: 장애물 회피 유형을 결정합니다. Detour Crowd는 여러 가지 장애물 회피 패턴을 제공하며, 이 값으로 사용할 패턴을 지정할 수 있습니다.
+		separationWeight: 분리 가중치입니다. 에이전트가 다른 에이전트로부터 얼마나 멀리 떨어져 이동할 것인지를 결정합니다. 높은 값은 다른 에이전트와의 거리를 더 많이 유지하려는 경향을 나타냅니다.
+	*/
+	dtCrowdAgentParams ap;
+	memset(&ap, 0, sizeof(ap));
+	ap.radius = 0.6f;
+	ap.height = 2.0f;
+	ap.maxAcceleration = 8.0f;
+	ap.maxSpeed = 8.5f;
+	ap.collisionQueryRange = ap.radius * 12.0f;
+	ap.pathOptimizationRange = ap.radius * 30.0f;
+	ap.updateFlags = DT_CROWD_ANTICIPATE_TURNS | DT_CROWD_OBSTACLE_AVOIDANCE;
+	ap.obstacleAvoidanceType = 3;
+	ap.separationWeight = 2.0f;
+
+	float pos[3];
+	// Convert FVector to float[3]
+	pos[0] = position.X;
+	pos[1] = position.Y;
+	pos[2] = position.Z;
+
+	return m_crowd->addAgent(pos, &ap);
+}
+
+void NavigationSystem::RemoveAgent(const int agentId)
+{
+	if (m_crowd)
+	{
+		m_crowd->removeAgent(agentId);
+	}
+}
+
+void NavigationSystem::SetRandomDestination(int agentId, float maxRadius)
+{
+	if (agentId < 0 || agentId >= MAX_AGENT) return;
+
+	const dtCrowdAgent* agent = m_crowd->getAgent(agentId);
+	if (!agent) return;
+
+	dtPolyRef startRef;
+	float nearestPt[3];
+	float polyPickExt[3] = {2.0f, 4.0f, 2.0f};
+	// 에이전트의 현재 위치에서 가장 가까운 폴리곤 찾기
+	dtStatus status = m_navQuery->findNearestPoly(agent->npos, polyPickExt, &m_filter, &startRef, nearestPt);
+	if (dtStatusFailed(status)) return;
+
+
+	float newTarget[3];
+	dtPolyRef targetRef;
+
+	// 에이전트의 현재 위치 주변에서 랜덤한 위치 찾기
+	status = m_navQuery->findRandomPointAroundCircle(startRef, agent->npos, maxRadius, &m_filter, DetourUtil::frand, &targetRef, newTarget);
+
+	if (dtStatusSucceed(status)) 
+	{
+		// 찾은 위치를 에이전트의 새로운 목적지로 설정
+		m_crowd->requestMoveTarget(agentId, targetRef, newTarget);
+	}
+}
+
+const dtCrowdAgent* NavigationSystem::GetAgent(int agentId)
+{
+	return m_crowd->getAgent(agentId);
+}
+
+bool NavigationSystem::InitializeCrowd()
+{
+	const int maxAgents = 20; // Maximum number of agents
+	const float maxAgentRadius = 0.6f; // Maximum agent radius
+	m_crowd = dtAllocCrowd();
+	if (!m_crowd || !m_crowd->init(maxAgents, maxAgentRadius, m_navMesh))
+	{
+		// Handle initialization failure
+		return false;
+	}
+
+	// Additional crowd configuration as needed
+
+	return true;
+}
+
+void NavigationSystem::CleanupCrowd()
+{
+	if (m_crowd)
+	{
+		dtFreeCrowd(m_crowd);
+		m_crowd = nullptr;
+	}
 }
 
 void NavigationSystem::SetRandomStart()

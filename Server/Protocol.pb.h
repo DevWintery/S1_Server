@@ -3085,8 +3085,18 @@ class S_INTERACT final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kStepIdFieldNumber = 2,
     kInteractTypeFieldNumber = 1,
   };
+  // uint64 step_id = 2;
+  void clear_step_id();
+  uint64_t step_id() const;
+  void set_step_id(uint64_t value);
+  private:
+  uint64_t _internal_step_id() const;
+  void _internal_set_step_id(uint64_t value);
+  public:
+
   // .Protocol.InteractType interact_type = 1;
   void clear_interact_type();
   ::Protocol::InteractType interact_type() const;
@@ -3104,6 +3114,7 @@ class S_INTERACT final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    uint64_t step_id_;
     int interact_type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -4130,6 +4141,26 @@ inline void S_INTERACT::_internal_set_interact_type(::Protocol::InteractType val
 inline void S_INTERACT::set_interact_type(::Protocol::InteractType value) {
   _internal_set_interact_type(value);
   // @@protoc_insertion_point(field_set:Protocol.S_INTERACT.interact_type)
+}
+
+// uint64 step_id = 2;
+inline void S_INTERACT::clear_step_id() {
+  _impl_.step_id_ = uint64_t{0u};
+}
+inline uint64_t S_INTERACT::_internal_step_id() const {
+  return _impl_.step_id_;
+}
+inline uint64_t S_INTERACT::step_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_INTERACT.step_id)
+  return _internal_step_id();
+}
+inline void S_INTERACT::_internal_set_step_id(uint64_t value) {
+  
+  _impl_.step_id_ = value;
+}
+inline void S_INTERACT::set_step_id(uint64_t value) {
+  _internal_set_step_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_INTERACT.step_id)
 }
 
 #ifdef __GNUC__

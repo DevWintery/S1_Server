@@ -271,7 +271,8 @@ struct C_INTERACTDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 C_INTERACTDefaultTypeInternal _C_INTERACT_default_instance_;
 PROTOBUF_CONSTEXPR S_INTERACT::S_INTERACT(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.interact_type_)*/0
+    /*decltype(_impl_.step_id_)*/uint64_t{0u}
+  , /*decltype(_impl_.interact_type_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct S_INTERACTDefaultTypeInternal {
   PROTOBUF_CONSTEXPR S_INTERACTDefaultTypeInternal()
@@ -437,6 +438,7 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::S_INTERACT, _impl_.interact_type_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_INTERACT, _impl_.step_id_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::C_LOGIN)},
@@ -510,8 +512,9 @@ const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABL
   "d\030\001 \001(\004\022\016\n\006damage\030\002 \001(\002\"*\n\005S_HIT\022\021\n\tobje"
   "ct_id\030\001 \001(\004\022\016\n\006damage\030\002 \001(\002\";\n\nC_INTERAC"
   "T\022-\n\rinteract_type\030\001 \001(\0162\026.Protocol.Inte"
-  "ractType\";\n\nS_INTERACT\022-\n\rinteract_type\030"
-  "\001 \001(\0162\026.Protocol.InteractTypeb\006proto3"
+  "ractType\"L\n\nS_INTERACT\022-\n\rinteract_type\030"
+  "\001 \001(\0162\026.Protocol.InteractType\022\017\n\007step_id"
+  "\030\002 \001(\004b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -519,7 +522,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_de
 };
 static ::_pbi::once_flag descriptor_table_Protocol_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Protocol_2eproto = {
-    false, false, 1157, descriptor_table_protodef_Protocol_2eproto,
+    false, false, 1174, descriptor_table_protodef_Protocol_2eproto,
     "Protocol.proto",
     &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 19,
     schemas, file_default_instances, TableStruct_Protocol_2eproto::offsets,
@@ -4134,11 +4137,14 @@ S_INTERACT::S_INTERACT(const S_INTERACT& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   S_INTERACT* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.interact_type_){}
+      decltype(_impl_.step_id_){}
+    , decltype(_impl_.interact_type_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.interact_type_ = from._impl_.interact_type_;
+  ::memcpy(&_impl_.step_id_, &from._impl_.step_id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.interact_type_) -
+    reinterpret_cast<char*>(&_impl_.step_id_)) + sizeof(_impl_.interact_type_));
   // @@protoc_insertion_point(copy_constructor:Protocol.S_INTERACT)
 }
 
@@ -4147,7 +4153,8 @@ inline void S_INTERACT::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.interact_type_){0}
+      decltype(_impl_.step_id_){uint64_t{0u}}
+    , decltype(_impl_.interact_type_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -4175,7 +4182,9 @@ void S_INTERACT::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  _impl_.interact_type_ = 0;
+  ::memset(&_impl_.step_id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.interact_type_) -
+      reinterpret_cast<char*>(&_impl_.step_id_)) + sizeof(_impl_.interact_type_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -4191,6 +4200,14 @@ const char* S_INTERACT::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_interact_type(static_cast<::Protocol::InteractType>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 step_id = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.step_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
@@ -4230,6 +4247,12 @@ uint8_t* S_INTERACT::_InternalSerialize(
       1, this->_internal_interact_type(), target);
   }
 
+  // uint64 step_id = 2;
+  if (this->_internal_step_id() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(2, this->_internal_step_id(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -4245,6 +4268,11 @@ size_t S_INTERACT::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // uint64 step_id = 2;
+  if (this->_internal_step_id() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_step_id());
+  }
 
   // .Protocol.InteractType interact_type = 1;
   if (this->_internal_interact_type() != 0) {
@@ -4270,6 +4298,9 @@ void S_INTERACT::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from._internal_step_id() != 0) {
+    _this->_internal_set_step_id(from._internal_step_id());
+  }
   if (from._internal_interact_type() != 0) {
     _this->_internal_set_interact_type(from._internal_interact_type());
   }
@@ -4290,7 +4321,12 @@ bool S_INTERACT::IsInitialized() const {
 void S_INTERACT::InternalSwap(S_INTERACT* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  swap(_impl_.interact_type_, other->_impl_.interact_type_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(S_INTERACT, _impl_.interact_type_)
+      + sizeof(S_INTERACT::_impl_.interact_type_)
+      - PROTOBUF_FIELD_OFFSET(S_INTERACT, _impl_.step_id_)>(
+          reinterpret_cast<char*>(&_impl_.step_id_),
+          reinterpret_cast<char*>(&other->_impl_.step_id_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata S_INTERACT::GetMetadata() const {

@@ -24,6 +24,7 @@ bool Room::EnterRoom(shared_ptr<Object> object)
 	//TODO : TEMP
 	if (Init == false)
 	{
+		_step = 0;
 		MapInitialize();
 	}
 
@@ -258,6 +259,21 @@ void Room::HandleHit(Protocol::C_HIT pkt)
 	hitPkt.set_damage(pkt.damage());
 	auto sendBuffer = ServerPacketHandler::MakeSendBuffer(hitPkt);
 	Broadcast(sendBuffer);
+}
+
+void Room::HandleInteract(Protocol::C_INTERACT pkt)
+{
+	if (pkt.interact_type() == Protocol::INTERACT_NEXT_STEP)
+	{
+		_step += 1;
+
+		Protocol::S_INTERACT interactPkt;
+
+		interactPkt.set_interact_type(Protocol::INTERACT_NEXT_STEP);
+		interactPkt.set_step_id(_step);
+		auto sendBuffer = ServerPacketHandler::MakeSendBuffer(interactPkt);
+		Broadcast(sendBuffer);
+	}
 }
 
 void Room::HandleAnimationState(Protocol::C_ANIMATION_STATE pkt)

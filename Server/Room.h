@@ -28,6 +28,8 @@ public:
 
 	void HandleHit(Protocol::C_HIT pkt);
 
+	void HandleInteract(Protocol::C_INTERACT pkt);
+
 	void HandleAnimationState(Protocol::C_ANIMATION_STATE pkt);
 	void UpdateRoom();
 
@@ -54,6 +56,8 @@ private:
 
 	//TODO : TEMP
 	bool Init = false;
+	int _step = 0;
+
 	void MapInitialize();
 };
 

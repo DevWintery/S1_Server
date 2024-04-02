@@ -88,5 +88,7 @@ bool Handle_C_HIT(SharedPacketSession& session, Protocol::C_HIT& pkt)
 
 bool Handle_C_INTERACT(SharedPacketSession& session, Protocol::C_INTERACT& pkt)
 {
+	GRoom->DoAsync(&Room::HandleInteract, pkt);
+
 	return true;
 }

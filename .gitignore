@@ -1,3 +1,19 @@
+#visual studio
+.vs/
+*.pdb
+*.tlog
+*.recipe
+*.iobj
+*.ipdb
+*.log
+*.idb
+*.ilk
+
+DummyClient/x64
+Server/x64
+
+Binary/
+
 # Prerequisites
 *.d
 

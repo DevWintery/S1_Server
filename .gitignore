@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+!Libraries/**/*.exe
+!Tools/**/*.exe
+!Common/**/*.exe
+
+
+!Libraries/**/*.lib
+!Tools/**/*.lib
+!Common/**/*.lib
+

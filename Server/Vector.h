@@ -19,6 +19,8 @@ struct FVector
 
 	static float Dist(const FVector& V1, const FVector& V2);
 	static float Distance(const FVector& V1, const FVector& V2);
+	static float Dot(const FVector& V1, const FVector& V2);
+	static FVector Zero() { return FVector(0.f, 0.f, 0.f); }
 
 	FVector operator+(const FVector& V) const
 	{

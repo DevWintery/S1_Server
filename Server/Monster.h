@@ -10,6 +10,7 @@ public:
 	virtual ~Monster();
 
 public:
+	virtual void Initialize() override;
 	virtual void Update() override;
 	virtual void TakeDamage(float damage) override;
 	
@@ -21,6 +22,9 @@ protected:
 
 	virtual void ReCalculateDestPos();
 
+private:
+	void SendMovePacket();
+
 public:
 	virtual void SetState(Protocol::MonsterState state);
 	virtual Protocol::MonsterState GetState() { return _state; }
@@ -29,6 +33,7 @@ public:
 	void SetMoveType(EMoveType moveType);
 	void SetDestPos(const FVector& destPos) { _destPos = destPos; }
 	virtual void SetPos(const FVector& pos) override;
+	void SetTarget(shared_ptr<Object> object);
 
 /*Detour Agent*/
 public:
@@ -36,14 +41,15 @@ public:
 	int GetAgentIndex() { return _agentIndex; }
 
 	FVector GetAgentPos();
+	float GetAgentSpeed();
 
-private:
-	void SetTarget(shared_ptr<Object> object) { _target = object; }
+	bool PerformRaycast(const FVector& startPos, const FVector& endPos);
+	bool IsTargetInSight(const FVector& targetPosition);
 
 private:
 	const uint64 MOVE_TICK = 40;
 	const uint64 ATTACK_TICK = 1500;
-	const uint64 WAIT_TIME = 3000;
+	const uint64 WAIT_TIME = 5000;
 	const float DISTANCE_MAX = 5.0f;
 	const float ATTACK_DISTANCE = 1200.f;
 

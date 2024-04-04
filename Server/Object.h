@@ -19,6 +19,7 @@ public:
 	bool IsPlayer() { return _isPlayer; }
 
 public:
+	virtual void Initialize() { }
 	virtual void Update() { }
 	virtual void TakeDamage(float damage) {}
 

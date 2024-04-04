@@ -30,9 +30,10 @@ bool Room::EnterRoom(shared_ptr<Object> object)
 
 	bool success = AddObject(object);
 
-	object->GetPos()->set_x(-9209 + Utils::GetRandom(-250.f, 250.f));
-	object->GetPos()->set_y(-11471 + Utils::GetRandom(-250.f, 250.f));
-	object->GetPos()->set_z(102.f);
+	FVector StartPos = FVector(-10589.000000, -11471.000000, 102.020608);
+	object->GetPos()->set_x(StartPos.X + Utils::GetRandom(-250.f, 250.f));
+	object->GetPos()->set_y(StartPos.Y + Utils::GetRandom(-250.f, 250.f));
+	object->GetPos()->set_z(StartPos.Z);
 	object->GetPos()->set_yaw(Utils::GetRandom(0.f, 100.f));
 
 	// 입장 사실을 신입 플레이어에게 알린다
@@ -151,16 +152,16 @@ void Room::HandleMove(Protocol::C_MOVE pkt)
 	}
 
 	//플레이어가 이동했다면 몬스터의 스테이트도 체크한다.
-	//for (const auto& object : _objects)
-	//{
-	//	if (object.second->GetInfo()->creature_type() != Protocol::CREATURE_TYPE_MONSTER)
-	//	{
-	//		continue;
-	//	}
+	for (const auto& object : _objects)
+	{
+		if (object.second->GetInfo()->creature_type() != Protocol::CREATURE_TYPE_MONSTER)
+		{
+			continue;
+		}
 
-	//	shared_ptr<Monster> monster = dynamic_pointer_cast<Monster>(object.second);
-	//	monster->SetTarget(player);
-	//}
+		shared_ptr<Monster> monster = dynamic_pointer_cast<Monster>(object.second);
+		monster->SetTarget(player);
+	}
 }
 
 void Room::HandleServerMove(Protocol::PosInfo* posInfo)
@@ -267,8 +268,22 @@ void Room::HandleInteract(Protocol::C_INTERACT pkt)
 	{
 		_step += 1;
 
+		if (_step == 2)
+		{
+			DoTimer(5000, [this]()
+				{
+					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
+					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
+					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
+					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
+					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
+					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
+				});
+		}
+
 		Protocol::S_INTERACT interactPkt;
 
+		interactPkt.set_object_id(pkt.object_id());
 		interactPkt.set_interact_type(Protocol::INTERACT_NEXT_STEP);
 		interactPkt.set_step_id(_step);
 		auto sendBuffer = ServerPacketHandler::MakeSendBuffer(interactPkt);
@@ -298,18 +313,6 @@ void Room::UpdateRoom()
 
 	//30프레임으로 Room 업데이트
 	GRoom->DoTimer(DELTA_TIME, &Room::UpdateRoom);
-}
-
-const std::vector<std::shared_ptr<Object>> Room::GetObjects()
-{
-	std::vector<shared_ptr<Object>> v;
-
-	for (auto obj : _objects)
-	{
-		v.push_back(obj.second);
-	}
-
-	return v;
 }
 
 bool Room::AddObject(shared_ptr<Object> object)
@@ -343,7 +346,7 @@ bool Room::RemoveObject(uint64 objectId)
 	return true;
 }
 
-void Room::SpawnMonster(FVector spawnPos, FVector targetPos, EMoveMode moveMode)
+void Room::SpawnMonster(FVector spawnPos, FVector targetPos, EMoveMode moveMode, bool sendPacket)
 {
 	shared_ptr<Monster> monster = ObjectUtils::CreateMonster();
 
@@ -356,7 +359,20 @@ void Room::SpawnMonster(FVector spawnPos, FVector targetPos, EMoveMode moveMode)
 	int _agentIndex = NavigationSystem::GetInstance()->AddAgent(Utils::UE5ToRecast_Meter(spawnPos));
 	monster->SetAgentIndex(_agentIndex);
 
+	monster->Initialize();
+
 	AddObject(monster);
+
+	if (sendPacket)
+	{
+		Protocol::S_SPAWN spawnPkt;
+
+		Protocol::ObjectInfo* objectInfo = spawnPkt.add_objects();
+		objectInfo->CopyFrom(*monster->GetInfo());
+
+		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+		Broadcast(sendBuffer, monster->GetInfo()->object_id());
+	}
 }
 
 void Room::MapInitialize()
@@ -364,13 +380,13 @@ void Room::MapInitialize()
 	Init = true;
 
 	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
 	//SpawnMonster(FVector(-5321.f, -11277.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
 
 	//SpawnMonster(FVector(-908.f, -10519.f, 1005.7f), FVector(-2580.f, -5360.f, 1005.7f));

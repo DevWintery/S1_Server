@@ -33,14 +33,11 @@ public:
 	void HandleAnimationState(Protocol::C_ANIMATION_STATE pkt);
 	void UpdateRoom();
 
-public:
-	const vector<shared_ptr<Object>> GetObjects();
-
 private:
 	bool AddObject(shared_ptr<Object> object);
 	bool RemoveObject(uint64 objectId);
 
-	void SpawnMonster(FVector spawnPos, FVector targetPos, EMoveMode moveMode = EMoveMode::Patrol);
+	void SpawnMonster(FVector spawnPos, FVector targetPos, EMoveMode moveMode = EMoveMode::Patrol, bool sendPacket = false);
 
 private:
 	bool HitCheck(shared_ptr<Object> targetObject, FVector start, FVector end);

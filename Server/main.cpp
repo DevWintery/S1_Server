@@ -53,7 +53,7 @@ int main()
 
 	GRoom->DoAsync(&Room::UpdateRoom);
 	
-	for (int32 i = 0; i < 5; i++)
+	for (int32 i = 0; i < 10; i++)
 	{
 		GThreadManager->Launch([&service]()
 			{

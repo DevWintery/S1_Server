@@ -110,11 +110,13 @@ message S_HIT
 
 message C_INTERACT
 {
-    InteractType interact_type = 1;
+    uint64 object_id = 1;
+    InteractType interact_type = 2;
 }
 
 message S_INTERACT
 {
-    InteractType interact_type = 1;
-    uint64 step_id = 2;
+    uint64 object_id = 1;
+    InteractType interact_type = 2;
+    uint64 step_id = 3;
 }

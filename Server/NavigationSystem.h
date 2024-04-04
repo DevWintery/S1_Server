@@ -279,8 +279,16 @@ public:
 	int AddAgent(const FVector& position);
 	void RemoveAgent(const int agentId);
 
-	void SetRandomDestination(int agentId, float maxRadius = 2.f);
+	const FVector SetRandomDestination(int agentId, float maxRadius = 2.f, float speed = 1.f);
+	void SetDestination(int agentId, const FVector& position, float speed = 1.f);
+	void StopAgentMovement(int agentId);
+
 	const dtCrowdAgent* GetAgent(int agentId);
+
+	bool IsAgentArrived(const int agentId, const float* targetPos, const float arrivalThreshold);
+
+	bool Raycast(const FVector& startPos, const FVector& endPos);
+	void SetAgentSpeed(int agentId, float speed);
 
 private:
 	bool InitializeCrowd();

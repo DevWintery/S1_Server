@@ -290,7 +290,7 @@ int NavigationSystem::AddAgent(const FVector& position)
 	ap.radius = 0.6f;
 	ap.height = 2.0f;
 	ap.maxAcceleration = 8.0f;
-	ap.maxSpeed = 8.5f;
+	ap.maxSpeed = 10.f;
 	ap.collisionQueryRange = ap.radius * 12.0f;
 	ap.pathOptimizationRange = ap.radius * 30.0f;
 	ap.updateFlags = DT_CROWD_ANTICIPATE_TURNS | DT_CROWD_OBSTACLE_AVOIDANCE;
@@ -314,20 +314,28 @@ void NavigationSystem::RemoveAgent(const int agentId)
 	}
 }
 
-void NavigationSystem::SetRandomDestination(int agentId, float maxRadius)
+const FVector NavigationSystem::SetRandomDestination(int agentId, float maxRadius, float speed)
 {
-	if (agentId < 0 || agentId >= MAX_AGENT) return;
+	if (agentId < 0 || agentId >= MAX_AGENT)
+	{
+		return FVector::Zero();
+	}
 
 	const dtCrowdAgent* agent = m_crowd->getAgent(agentId);
-	if (!agent) return;
+	if (!agent)
+	{
+		return FVector::Zero();
+	}
 
 	dtPolyRef startRef;
 	float nearestPt[3];
 	float polyPickExt[3] = {2.0f, 4.0f, 2.0f};
 	// 에이전트의 현재 위치에서 가장 가까운 폴리곤 찾기
 	dtStatus status = m_navQuery->findNearestPoly(agent->npos, polyPickExt, &m_filter, &startRef, nearestPt);
-	if (dtStatusFailed(status)) return;
-
+	if (dtStatusFailed(status))
+	{
+		return FVector::Zero();
+	}
 
 	float newTarget[3];
 	dtPolyRef targetRef;
@@ -337,14 +345,87 @@ void NavigationSystem::SetRandomDestination(int agentId, float maxRadius)
 
 	if (dtStatusSucceed(status)) 
 	{
+		SetAgentSpeed(agentId, speed);
 		// 찾은 위치를 에이전트의 새로운 목적지로 설정
 		m_crowd->requestMoveTarget(agentId, targetRef, newTarget);
+
+		return Utils::RecastToUE5_Meter(newTarget);
 	}
+
+	return FVector::Zero();
+}
+
+void NavigationSystem::SetDestination(int agentId, const FVector& position, float speed)
+{
+	FVector recastPosition = Utils::UE5ToRecast_Meter(position);
+	float npos[3] = { recastPosition.X, recastPosition.Y, recastPosition.Z };
+	float polyPickExt[3] = { 2.0f, 4.0f, 2.0f };
+	float nearest[3];
+	dtPolyRef ref;
+	
+	dtStatus status = m_navQuery->findNearestPoly(npos, polyPickExt, &m_filter, &ref, nearest);
+	if (dtStatusSucceed(status))
+	{
+		SetAgentSpeed(agentId, speed);
+		m_crowd->requestMoveTarget(agentId, ref, nearest);
+	}
+}
+
+void NavigationSystem::StopAgentMovement(int agentId)
+{
+	//SetAgentSpeed(agentId, 0.f);
+
+	m_crowd->resetMoveTarget(agentId);
 }
 
 const dtCrowdAgent* NavigationSystem::GetAgent(int agentId)
 {
 	return m_crowd->getAgent(agentId);
+}
+
+bool NavigationSystem::IsAgentArrived(const int agentId, const float* targetPos, const float arrivalThreshold)
+{
+	const dtCrowdAgent* agent = m_crowd->getAgent(agentId);
+
+	if (!agent) 
+	{
+		return false;
+	}
+
+	// 에이전트의 현재 위치
+	const float* agentPos = agent->npos;
+
+	// 현재 위치와 목표 위치 사이의 거리를 계산
+	float distSq = dtVdistSqr(agentPos, targetPos);
+
+	// 거리가 임계값 이하인지 확인
+	return distSq <= arrivalThreshold * arrivalThreshold;
+}
+
+bool NavigationSystem::Raycast(const FVector& startPos, const FVector& endPos)
+{
+	FVector recast = Utils::UE5ToRecast_Meter(startPos);
+	float start[3] = { recast.X, recast.Y, recast.Z };
+	recast = Utils::UE5ToRecast_Meter(endPos);
+	float end[3] = { recast.X, recast.Y, recast.Z };
+
+	float t; // 레이캐스트가 장애물에 부딪힌 지점까지의 비율
+	float hitNormal[3]; // 장애물에 부딪힌 지점의 노멀 벡터
+	dtPolyRef path[256]; // 장애물을 찾기 위해 경로상의 폴리곤 ID를 저장하는 배열
+	int pathCount; // 찾은 폴리곤의 수
+	const int maxPath = 256; // path 배열의 최대 크기
+
+	dtPolyRef startRef;
+	float nearestPt[3];
+	float polyPickExt[3] = { 2.0f, 4.0f, 2.0f };
+	float nearest[3];
+	m_navQuery->findNearestPoly(start, polyPickExt, &m_filter, &startRef, nearestPt);
+
+	// 레이캐스트를 수행합니다.
+	dtStatus status = m_navQuery->raycast(startRef, start, end, &m_filter, &t, hitNormal, path, &pathCount, maxPath);
+
+	// t가 1보다 작다면, 레이가 장애물에 맞았음을 의미합니다.
+	return t < 1.0f;
 }
 
 bool NavigationSystem::InitializeCrowd()
@@ -361,6 +442,26 @@ bool NavigationSystem::InitializeCrowd()
 	// Additional crowd configuration as needed
 
 	return true;
+}
+
+void NavigationSystem::SetAgentSpeed(int agentId, float speed)
+{
+	if (!m_crowd)
+	{
+		return; // DetourCrowd 객체가 초기화되지 않았다면 함수를 종료합니다.
+	}
+
+	dtCrowdAgentParams agentParams;
+	const dtCrowdAgent* agent = m_crowd->getAgent(agentId);
+	if (agent)
+	{
+		// 에이전트의 현재 파라미터를 복사합니다.
+		memcpy(&agentParams, &agent->params, sizeof(dtCrowdAgentParams));
+		// 최대 속도를 0으로 설정합니다.
+		agentParams.maxSpeed = speed;
+		// 변경된 파라미터를 적용합니다.
+		m_crowd->updateAgentParameters(agentId, &agentParams);
+	}
 }
 
 void NavigationSystem::CleanupCrowd()

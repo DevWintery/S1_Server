@@ -5,7 +5,18 @@
 
 class Utils
 {
+private:
+	static double GetPI()
+	{
+		return 3.14159265358979323846;
+	}
+
 public:
+	static float RadianToDegree(float radian)
+	{
+		return radian * 180.0f / GetPI();
+	}
+
 	template<typename T>
 	static T GetRandom(T min, T max)
 	{

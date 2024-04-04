@@ -2937,9 +2937,19 @@ class C_INTERACT final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kInteractTypeFieldNumber = 1,
+    kObjectIdFieldNumber = 1,
+    kInteractTypeFieldNumber = 2,
   };
-  // .Protocol.InteractType interact_type = 1;
+  // uint64 object_id = 1;
+  void clear_object_id();
+  uint64_t object_id() const;
+  void set_object_id(uint64_t value);
+  private:
+  uint64_t _internal_object_id() const;
+  void _internal_set_object_id(uint64_t value);
+  public:
+
+  // .Protocol.InteractType interact_type = 2;
   void clear_interact_type();
   ::Protocol::InteractType interact_type() const;
   void set_interact_type(::Protocol::InteractType value);
@@ -2956,6 +2966,7 @@ class C_INTERACT final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    uint64_t object_id_;
     int interact_type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -3085,10 +3096,20 @@ class S_INTERACT final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kStepIdFieldNumber = 2,
-    kInteractTypeFieldNumber = 1,
+    kObjectIdFieldNumber = 1,
+    kStepIdFieldNumber = 3,
+    kInteractTypeFieldNumber = 2,
   };
-  // uint64 step_id = 2;
+  // uint64 object_id = 1;
+  void clear_object_id();
+  uint64_t object_id() const;
+  void set_object_id(uint64_t value);
+  private:
+  uint64_t _internal_object_id() const;
+  void _internal_set_object_id(uint64_t value);
+  public:
+
+  // uint64 step_id = 3;
   void clear_step_id();
   uint64_t step_id() const;
   void set_step_id(uint64_t value);
@@ -3097,7 +3118,7 @@ class S_INTERACT final :
   void _internal_set_step_id(uint64_t value);
   public:
 
-  // .Protocol.InteractType interact_type = 1;
+  // .Protocol.InteractType interact_type = 2;
   void clear_interact_type();
   ::Protocol::InteractType interact_type() const;
   void set_interact_type(::Protocol::InteractType value);
@@ -3114,6 +3135,7 @@ class S_INTERACT final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    uint64_t object_id_;
     uint64_t step_id_;
     int interact_type_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -4099,7 +4121,27 @@ inline void S_HIT::set_damage(float value) {
 
 // C_INTERACT
 
-// .Protocol.InteractType interact_type = 1;
+// uint64 object_id = 1;
+inline void C_INTERACT::clear_object_id() {
+  _impl_.object_id_ = uint64_t{0u};
+}
+inline uint64_t C_INTERACT::_internal_object_id() const {
+  return _impl_.object_id_;
+}
+inline uint64_t C_INTERACT::object_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_INTERACT.object_id)
+  return _internal_object_id();
+}
+inline void C_INTERACT::_internal_set_object_id(uint64_t value) {
+  
+  _impl_.object_id_ = value;
+}
+inline void C_INTERACT::set_object_id(uint64_t value) {
+  _internal_set_object_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_INTERACT.object_id)
+}
+
+// .Protocol.InteractType interact_type = 2;
 inline void C_INTERACT::clear_interact_type() {
   _impl_.interact_type_ = 0;
 }
@@ -4123,7 +4165,27 @@ inline void C_INTERACT::set_interact_type(::Protocol::InteractType value) {
 
 // S_INTERACT
 
-// .Protocol.InteractType interact_type = 1;
+// uint64 object_id = 1;
+inline void S_INTERACT::clear_object_id() {
+  _impl_.object_id_ = uint64_t{0u};
+}
+inline uint64_t S_INTERACT::_internal_object_id() const {
+  return _impl_.object_id_;
+}
+inline uint64_t S_INTERACT::object_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_INTERACT.object_id)
+  return _internal_object_id();
+}
+inline void S_INTERACT::_internal_set_object_id(uint64_t value) {
+  
+  _impl_.object_id_ = value;
+}
+inline void S_INTERACT::set_object_id(uint64_t value) {
+  _internal_set_object_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_INTERACT.object_id)
+}
+
+// .Protocol.InteractType interact_type = 2;
 inline void S_INTERACT::clear_interact_type() {
   _impl_.interact_type_ = 0;
 }
@@ -4143,7 +4205,7 @@ inline void S_INTERACT::set_interact_type(::Protocol::InteractType value) {
   // @@protoc_insertion_point(field_set:Protocol.S_INTERACT.interact_type)
 }
 
-// uint64 step_id = 2;
+// uint64 step_id = 3;
 inline void S_INTERACT::clear_step_id() {
   _impl_.step_id_ = uint64_t{0u};
 }

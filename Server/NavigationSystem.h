@@ -4,6 +4,7 @@
 #include "DetourNavMeshQuery.h"
 #include "DetourCommon.h"
 #include "DetourCrowd.h"
+#include "Singleton.h"
 
 namespace DetourUtil
 {
@@ -251,19 +252,8 @@ namespace DetourUtil
 	}
 }
 
-class NavigationSystem
+class NavigationSystem : public Singleton<NavigationSystem>
 {
-public:
-	static NavigationSystem* GetInstance()
-	{
-		if (m_instance == nullptr)
-		{
-			m_instance = new NavigationSystem();
-		}
-
-		return m_instance;
-	}
-
 public:
 	void Init(string binName);
 	void ReCalculate();
@@ -330,7 +320,4 @@ private:
 	dtPolyRef m_endRef;
 	float m_epos[3];
 	bool m_eposSet;
-
-private:
-	static NavigationSystem* m_instance;
 };

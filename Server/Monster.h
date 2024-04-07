@@ -15,13 +15,9 @@ public:
 	virtual void TakeDamage(float damage) override;
 	
 protected:
-	virtual void UpdateState();
 	virtual void UpdateIdle();
 	virtual void UpdateMove();
 	virtual void UpdateAttack();
-
-	virtual void ReCalculateDestPos();
-
 private:
 	void SendMovePacket();
 
@@ -47,14 +43,13 @@ public:
 	bool IsTargetInSight(const FVector& targetPosition);
 
 private:
-	const uint64 MOVE_TICK = 40;
 	const uint64 ATTACK_TICK = 1500;
 	const uint64 WAIT_TIME = 5000;
-	const float DISTANCE_MAX = 5.0f;
-	const float ATTACK_DISTANCE = 1200.f;
+	const float ATTACK_DISTANCE = 2500.f;
+	const float IN_ATTACK_DISTANCE = 4000.f;
+	const float SEARCH_RADIUS = 3.f;
 
 	uint64 nextAttackTickAfter = 0;
-	uint64 nextMoveTickAfter = 0;
 	uint64 nextWaitTickAfter = 0;
 
 private:

@@ -8,10 +8,14 @@
 #include "Monster.h"
 #include "NavigationSystem.h"
 
-shared_ptr<Room> GRoom = make_shared<Room>();
-
 Room::Room()
 {
+}
+
+Room::Room(const std::string& name, const std::string& map):
+	_name(name), _map(map)
+{
+
 }
 
 Room::~Room()
@@ -19,72 +23,121 @@ Room::~Room()
 
 }
 
-bool Room::EnterRoom(shared_ptr<Object> object)
+bool Room::EnterRoom(shared_ptr<Player> player, int64 roomId)
 {
-	//TODO : TEMP
-	if (Init == false)
+	//AddObject(player);
+	_room_objects.push_back(player);
+
+	Protocol::S_ENTER_ROOM pkt;
+
+	pkt.set_room_id(roomId);
+
+	for(const auto& obj : _room_objects)
 	{
-		_step = 0;
-		MapInitialize();
+		Protocol::ObjectInfo* info = pkt.add_players();
+		info->set_player_name(obj->GetInfo()->player_name());
 	}
 
-	bool success = AddObject(object);
-
-	FVector StartPos = FVector(-10589.000000, -11471.000000, 102.020608);
-	object->GetPos()->set_x(StartPos.X + Utils::GetRandom(-250.f, 250.f));
-	object->GetPos()->set_y(StartPos.Y + Utils::GetRandom(-250.f, 250.f));
-	object->GetPos()->set_z(StartPos.Z);
-	object->GetPos()->set_yaw(Utils::GetRandom(0.f, 100.f));
-
-	// 입장 사실을 신입 플레이어에게 알린다
-	if (auto player = dynamic_pointer_cast<Player>(object))
+	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	
+	for (auto& item : _room_objects)
 	{
-		Protocol::S_ENTER_GAME enterGamePkt;
-		enterGamePkt.set_success(success);
+		shared_ptr<Player> player = dynamic_pointer_cast<Player>(item);
+		if (player == nullptr)
+			continue;
 
-		Protocol::ObjectInfo* playerInfo = new Protocol::ObjectInfo();
-		playerInfo->CopyFrom(*object->GetInfo());
-		enterGamePkt.set_allocated_player(playerInfo);
-
-		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
-		if (auto session = player->GetSession().lock())
-			session->Send(sendBuffer);
-	}
-
-	// 입장 사실을 다른 플레이어에게 알린다
-	{
-		Protocol::S_SPAWN spawnPkt;
-
-		Protocol::ObjectInfo* objectInfo = spawnPkt.add_objects();
-		objectInfo->CopyFrom(*object->GetInfo());
-
-		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-		Broadcast(sendBuffer, object->GetInfo()->object_id());
-	}
-
-	// 기존 입장한 플레이어 목록을 신입 플레이어한테 전송해준다
-	if (auto player = dynamic_pointer_cast<Player>(object))
-	{
-		Protocol::S_SPAWN spawnPkt;
-
-		for (auto& item : _objects)
+		if (shared_ptr<GameSession> session = player->GetSession().lock())
 		{
-			/*if (item.second->IsPlayer() == false)
-				continue;*/
-
-			Protocol::ObjectInfo* objInfo = spawnPkt.add_objects();
-			objInfo->CopyFrom(*item.second->GetInfo());
-		}
-
-		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-		if (auto session = player->GetSession().lock())
 			session->Send(sendBuffer);
+		}
 	}
 
-	return success;
+	return true;
 }
 
-bool Room::LeaveRoom(shared_ptr<Object> object)
+bool Room::RoomSetting()
+{
+	if (_initialize)
+	{
+		return true;
+	}
+
+	RoomInitialize();
+
+	return true;
+}
+
+bool Room::EnterGame()
+{
+	//GRoom->DoAsync(&Room::RoomSetting);
+	//bool success = AddObject(object);
+
+	for (const auto& obj : _room_objects)
+	{
+		shared_ptr<Object> object = obj;
+
+		AddObject(object);
+
+		FVector StartPos = FVector(-10589.000000, -11471.000000, 102.020608);
+		object->GetPos()->set_x(StartPos.X + Utils::GetRandom(-250.f, 250.f));
+		object->GetPos()->set_y(StartPos.Y + Utils::GetRandom(-250.f, 250.f));
+		object->GetPos()->set_z(StartPos.Z);
+		object->GetPos()->set_yaw(Utils::GetRandom(0.f, 100.f));
+
+		//플레이어 전부 입장
+		if (auto player = dynamic_pointer_cast<Player>(object))
+		{
+			Protocol::S_ENTER_GAME enterGamePkt;
+			enterGamePkt.set_success(true);
+
+			Protocol::ObjectInfo* playerInfo = new Protocol::ObjectInfo();
+			playerInfo->CopyFrom(*object->GetInfo());
+			enterGamePkt.set_allocated_player(playerInfo);
+
+			shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
+			if (auto session = player->GetSession().lock())
+				session->Send(sendBuffer);
+		}
+
+		//입장했으면 알리고
+		{
+			Protocol::S_SPAWN spawnPkt;
+
+			Protocol::ObjectInfo* objectInfo = spawnPkt.add_objects();
+			objectInfo->CopyFrom(*object->GetInfo());
+
+			shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+			Broadcast(sendBuffer, object->GetInfo()->object_id());
+		}
+
+		// 기존 입장한 플레이어 목록을 신입 플레이어한테 전송해준다
+		if (auto player = dynamic_pointer_cast<Player>(object))
+		{
+			Protocol::S_SPAWN spawnPkt;
+
+			for (auto& item : _objects)
+			{
+				/*if (item.second->IsPlayer() == false)
+					continue;*/
+
+				Protocol::ObjectInfo* objInfo = spawnPkt.add_objects();
+				objInfo->CopyFrom(*item.second->GetInfo());
+			}
+
+			shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+			if (auto session = player->GetSession().lock())
+				session->Send(sendBuffer);
+		}
+	}
+
+	_room_objects.clear();
+
+	RoomSetting();
+
+	return true;
+}
+
+bool Room::LeaveGame(shared_ptr<Object> object)
 {
 	if (object == nullptr)
 		return false;
@@ -120,12 +173,12 @@ bool Room::LeaveRoom(shared_ptr<Object> object)
 
 bool Room::HandleEnterPlayer(shared_ptr<Player> player)
 {
-	return EnterRoom(player);
+	return EnterGame();
 }
 
 bool Room::HandleLeavePlayer(shared_ptr<Player> player)
 {
-	return LeaveRoom(player);
+	return LeaveGame(player);
 }
 
 void Room::HandleMove(Protocol::C_MOVE pkt)
@@ -272,12 +325,37 @@ void Room::HandleInteract(Protocol::C_INTERACT pkt)
 		{
 			DoTimer(5000, [this]()
 				{
-					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
-					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
-					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
-					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
-					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
-					SpawnMonster(FVector(-1880.f, -12340.f, -18.7f), FVector(-1880.f, -6230.f, -18.7f), EMoveMode::Rush, true);
+#if _DEBUG
+					std::vector<ns::Monster> monsters = JsonUtil::ParseJson("F:\\S1\\Server\\Hanger.json", _step);
+#else
+					std::vector<ns::Monster> monsters = JsonUtil::ParseJson("Hanger.json", _step);
+#endif
+					uint64 time = 1000;
+					int i = 0;
+					for (const auto& monster : monsters)
+					{
+						DoTimer(time * i, [this, monster]()
+							{
+								SpawnMonster(monster);
+							});
+
+						i ++;
+					}
+				});
+
+			DoTimer(30000, [this, pkt]()
+				{
+					_step += 1;
+
+					std::cout << "Send Stage Clear Packet" << std::endl;
+
+					Protocol::S_INTERACT interactPkt;
+
+					interactPkt.set_object_id(pkt.object_id());
+					interactPkt.set_interact_type(Protocol::INTERACT_NEXT_STEP);
+					interactPkt.set_step_id(_step);
+					auto sendBuffer = ServerPacketHandler::MakeSendBuffer(interactPkt);
+					Broadcast(sendBuffer);
 				});
 		}
 
@@ -312,7 +390,7 @@ void Room::UpdateRoom()
 	}
 
 	//30프레임으로 Room 업데이트
-	GRoom->DoTimer(DELTA_TIME, &Room::UpdateRoom);
+	DoTimer(DELTA_TIME, &Room::UpdateRoom);
 }
 
 bool Room::AddObject(shared_ptr<Object> object)
@@ -346,58 +424,83 @@ bool Room::RemoveObject(uint64 objectId)
 	return true;
 }
 
-void Room::SpawnMonster(FVector spawnPos, FVector targetPos, EMoveMode moveMode, bool sendPacket)
+void Room::SpawnMonster(FVector spawnPos, FVector destPos)
 {
 	shared_ptr<Monster> monster = ObjectUtils::CreateMonster();
 
 	//SpawnPos, TargetPos 설정
 	monster->SetMoveType(EMoveType::Move);
-	monster->SetMoveMode(moveMode);
+	monster->SetMoveMode(EMoveMode::Rush);
 	monster->SetPos(spawnPos);
-	monster->SetDestPos(targetPos);
+	monster->SetDestPos(destPos);
 
 	int _agentIndex = NavigationSystem::GetInstance()->AddAgent(Utils::UE5ToRecast_Meter(spawnPos));
 	monster->SetAgentIndex(_agentIndex);
+	monster->Initialize();
+	AddObject(monster);
 
+	DoAsync(&Room::SendMonsterSpawnPacket, monster);
+}
+
+void Room::SpawnMonster(FVector spawnPos)
+{
+	shared_ptr<Monster> monster = ObjectUtils::CreateMonster();
+
+	//SpawnPos, TargetPos 설정
+	monster->SetMoveType(EMoveType::Move);
+	monster->SetMoveMode(EMoveMode::Patrol);
+	monster->SetPos(spawnPos);
+
+	int _agentIndex = NavigationSystem::GetInstance()->AddAgent(Utils::UE5ToRecast_Meter(spawnPos));
+	monster->SetAgentIndex(_agentIndex);
 	monster->Initialize();
 
 	AddObject(monster);
 
-	if (sendPacket)
+	DoAsync(&Room::SendMonsterSpawnPacket, monster);
+}
+
+void Room::SpawnMonster(ns::Monster info)
+{
+	if (info.type == "Rush")
 	{
-		Protocol::S_SPAWN spawnPkt;
-
-		Protocol::ObjectInfo* objectInfo = spawnPkt.add_objects();
-		objectInfo->CopyFrom(*monster->GetInfo());
-
-		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-		Broadcast(sendBuffer, monster->GetInfo()->object_id());
+		ns::Location loc = info.location;
+		SpawnMonster(FVector(loc.x, loc.y, loc.z), FVector(info.dest_location->x, info.dest_location->y, info.dest_location->z));
+	}
+	else
+	{
+		ns::Location loc = info.location;
+		SpawnMonster(FVector(loc.x, loc.y, loc.z));
 	}
 }
 
-void Room::MapInitialize()
+void Room::SendMonsterSpawnPacket(shared_ptr<Monster> monster)
 {
-	Init = true;
+	Protocol::S_SPAWN spawnPkt;
 
-	SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5703.f, -11650.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
-	//SpawnMonster(FVector(-5321.f, -11277.f, -18.7f), FVector(-2580.f, -5360.f, -18.7f));
+	Protocol::ObjectInfo* objectInfo = spawnPkt.add_objects();
+	objectInfo->CopyFrom(*monster->GetInfo());
 
-	//SpawnMonster(FVector(-908.f, -10519.f, 1005.7f), FVector(-2580.f, -5360.f, 1005.7f));
-	//SpawnMonster(FVector(-908.f, -9270.f, 1005.7f), FVector(-2580.f, -5360.f, 1005.7f));
+	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+	Broadcast(sendBuffer);
+}
 
-	//SpawnMonster(FVector(-2159.f, -6507.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
-	//SpawnMonster(FVector(-1835.f, -6507.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
-	//SpawnMonster(FVector(-1835.f, -6125.f, -20.f), FVector(-2580.f, -5360.f, 1005.7f));
+bool Room::RoomInitialize()
+{
+	_initialize = true;
 
-	//Network Dev
-	//SpawnMonster(FVector(1550.f, -210.0f, 0.f), FVector(-970.0f, -210.0f, 0.f), EMoveMode::Rush);
+#if _DEBUG
+	std::vector<ns::Monster> monsters = JsonUtil::ParseJson("F:\\S1\\Server\\Hanger.json", 0);
+#else
+	std::vector<ns::Monster> monsters = JsonUtil::ParseJson("Hanger.json", 0);
+#endif
+
+	for (const auto& monster : monsters)
+	{
+		SpawnMonster(monster);
+	}
+
+	return true;
 }
 
 bool Room::HitCheck(shared_ptr<Object> targetObject, FVector start, FVector end)

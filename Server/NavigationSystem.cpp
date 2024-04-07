@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "NavigationSystem.h"
 
-NavigationSystem* NavigationSystem::m_instance = nullptr;
-
 void NavigationSystem::Init(string binName)
 {
 	m_navMesh = DetourUtil::DeSerializedNavMesh(binName.c_str());

@@ -8,6 +8,8 @@
 #include "GameSessionManager.h"
 #include "Room.h"
 #include "NavigationSystem.h"
+#include "JsonUtil.h"
+#include "RoomManager.h"
 
 enum
 {
@@ -51,8 +53,6 @@ int main()
 
 	ASSERT_CRASH(service->Start());
 
-	GRoom->DoAsync(&Room::UpdateRoom);
-	
 	for (int32 i = 0; i < 10; i++)
 	{
 		GThreadManager->Launch([&service]()

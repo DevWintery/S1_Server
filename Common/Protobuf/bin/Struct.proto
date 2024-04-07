@@ -3,6 +3,13 @@ package Protocol;
 
 import "Enum.proto";
 
+message RoomInfo
+{
+	uint64 room_id = 1;
+	string name = 2;
+	string map = 3;
+}
+
 message PosInfo
 {
 	uint64 object_id = 1;
@@ -17,9 +24,10 @@ message PosInfo
 message ObjectInfo
 {
 	uint64 object_id = 1;
-	ObjectType object_type = 2;
-	CreatureType creature_type = 3;
-	PosInfo pos_info = 4;
+	string player_name = 2;
+	ObjectType object_type = 3;
+	CreatureType creature_type = 4;
+	PosInfo pos_info = 5;
 }
 
 message Vector3D

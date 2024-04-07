@@ -6,7 +6,6 @@ import "Struct.proto";
 
 message C_LOGIN
 {
-
 }
 
 message S_LOGIN
@@ -14,9 +13,38 @@ message S_LOGIN
     bool success = 1;
 }
 
+
+message C_CREATE_ROOM
+{
+    RoomInfo room_info = 1;
+    string player_name = 2;
+}
+
+message C_ROOM_LIST
+{
+
+}
+
+message S_ROOM_LIST
+{
+    repeated RoomInfo room_infos = 1;
+}
+
+message C_ENTER_ROOM
+{
+    int64 room_id = 1;
+    string player_name = 2;
+}
+
+message S_ENTER_ROOM
+{
+    int64 room_id = 1;
+    repeated ObjectInfo players = 2;
+}
+
 message C_ENTER_GAME
 {
-	uint64 playerIndex = 1;
+    int64 room_id = 1;
 }
 
 message S_ENTER_GAME

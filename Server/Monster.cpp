@@ -14,8 +14,7 @@ Monster::~Monster()
 
 void Monster::Initialize()
 {
-	ReCalculateDestPos();
-	SetState(Protocol::MONSTER_STATE_MOVE);
+	SetState(Protocol::MONSTER_STATE_IDLE);
 }
 
 void Monster::Update()
@@ -36,35 +35,18 @@ void Monster::Update()
 		case Protocol::MONSTER_STATE_MOVE:
 			UpdateMove();
 		break;
-
 		case Protocol::MONSTER_STATE_ATTACK:
+			NavigationSystem::GetInstance()->SetAgentSpeed(GetAgentIndex(), 1.f);
 			UpdateAttack();
 		break;
 	}
-
-	
-
-	//UpdateState();
-
-	//switch (GetState())
-	//{
-	//	case Protocol::MONSTER_STATE_IDLE:
-	//		NavigationSystem::GetInstance()->StopAgentMovement(GetAgentIndex());
-	//		UpdateIdle();
-	//	break;
-	//	case Protocol::MONSTER_STATE_MOVE:
-	//		UpdateMove();
-	//	break;
-	//	case Protocol::MONSTER_STATE_ATTACK:
-	//		NavigationSystem::GetInstance()->StopAgentMovement(GetAgentIndex());
-	//		UpdateAttack();
-	//	break;
-	//}
 }
 
 void Monster::TakeDamage(float damage)
 {
 	_hp -= damage;
+
+	SetState(Protocol::MONSTER_STATE_ATTACK);
 }
 
 void Monster::SetMoveMode(EMoveMode moveMode)
@@ -124,7 +106,7 @@ bool Monster::PerformRaycast(const FVector& startPos, const FVector& endPos)
 bool Monster::IsTargetInSight(const FVector& targetPosition)
 {
 	float dist = FVector::Distance(GetAgentPos(), targetPosition);
-	if (dist > ATTACK_DISTANCE)
+	if (dist > IN_ATTACK_DISTANCE)
 	{
 		return false;
 	}
@@ -152,73 +134,29 @@ void Monster::SetState(Protocol::MonsterState state)
 		_moveMode = EMoveMode::Patrol;
 	}
 
-	std::cout << "[MonsterState] TargetID :  " << "NONE" << ", State : " << state << std::endl;
-
 	_state = state;
 
 	Protocol::S_MONSTER_STATE pkt;
 	pkt.set_object_id(GetInfo()->object_id());
 	pkt.set_state(state);
 
+	int64 targetID = -1;
+
 	shared_ptr<Object> target = _target.lock();
 	if (target)
 	{
-		pkt.set_target_object_id(target->GetInfo()->object_id());
+		targetID = target->GetInfo()->object_id();
 	}
-	else
+
+	pkt.set_target_object_id(targetID);
+
+	std::cout << "[MonsterState] TargetID :  " << targetID << ", State : " << state << std::endl;
+
+	shared_ptr<Room> myRoom = room.load().lock();
+	if (myRoom)
 	{
-		pkt.set_target_object_id(-1);
+		myRoom->DoAsync(&Room::HandleMonsterState, pkt);
 	}
-
-
-	GRoom->DoAsync(&Room::HandleMonsterState, pkt);
-}
-
-void Monster::UpdateState()
-{
-	//죽음 체크
-	if (0 >= _hp)
-	{
-		SetState(Protocol::MONSTER_STATE_DIE);
-		return;
-	}
-
-	////target이 존재하면
-	//if (_target.lock() != nullptr)
-	//{
-	//	//TODO : _target이 죽거나 그랬으면 뭐 처리해줘야하는데 여기서 안할수도?
-	//	SetState(Protocol::MONSTER_STATE_ATTACK);
-	//	return;
-	//}
-
-	////타겟이 없으면 타겟을 검색한다.
-	//for (const auto& object : GRoom->GetObjects())
-	//{
-	//	if (object->GetInfo()->creature_type() != Protocol::CREATURE_TYPE_PLAYER)
-	//	{
-	//		continue;
-	//	}
-
-	//	FVector objectPos = object->GetPosVector();
-	//	FVector myPos = GetPosVector();
-
-	//	std::cout << FVector::Distance(myPos, objectPos) << std::endl;
-
-	//	if (ATTACK_DISTANCE >= FVector::Distance(myPos, objectPos))
-	//	{
-	//		std::cout << "[MonsterInfo] : Set Target Successed" << std::endl;
-	//		SetTarget(object);
-	//		SetState(Protocol::MONSTER_STATE_ATTACK);
-	//		return;
-	//	}
-	//}
-
-	////없으면 뭐 하던대로 둬야지
-	////검색을 했는데도 없으면 일상생활로 복귀
-	//if (_target.lock() == nullptr)
-	//{
-	//	return;
-	//}
 }
 
 void Monster::UpdateIdle()
@@ -247,13 +185,20 @@ void Monster::UpdateIdle()
 		{
 			//움직이기
 			_wait = false;
-			ReCalculateDestPos();
+			_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, SEARCH_RADIUS);
 			SetState(Protocol::MONSTER_STATE_MOVE);
 		}
 	}
 	else if(_moveType == EMoveType::Move)
 	{
-		ReCalculateDestPos();
+		if (_moveMode == EMoveMode::Rush)
+		{
+			NavigationSystem::GetInstance()->SetDestination(GetAgentIndex(), _destPos, 8.f);
+		}
+		else
+		{
+			_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, SEARCH_RADIUS);
+		}
 		SetState(Protocol::MONSTER_STATE_MOVE);
 	}
 }
@@ -292,6 +237,8 @@ void Monster::UpdateMove()
 		if (NavigationSystem::GetInstance()->IsAgentArrived(GetAgentIndex(), targetPos, 1.f))
 		{
 			NavigationSystem::GetInstance()->StopAgentMovement(GetAgentIndex());
+
+			SetState(Protocol::MONSTER_STATE_ATTACK);
 		}
 	}
 }
@@ -315,8 +262,6 @@ void Monster::UpdateAttack()
 	if (result == false)
 	{
 		NavigationSystem::GetInstance()->SetDestination(GetAgentIndex(), target->GetPosVector());
-
-		std::cout << "Tarcking" << std::endl;
 	}
 	else
 	{
@@ -332,25 +277,11 @@ void Monster::UpdateAttack()
 		attackPkt.set_end_y(target->GetPosVector().Y + Utils::GetRandom(-100.f, 100.f));
 		attackPkt.set_end_z(target->GetPosVector().Z + Utils::GetRandom(-50.f, 50.f));
 
-		GRoom->DoAsync(&Room::HandleServerAttack, attackPkt, target);
-	}
-}
-
-void Monster::ReCalculateDestPos()
-{
-	if (_moveType == EMoveType::Fix)
-	{
-		return;
-	}
-
-	if (_moveMode == EMoveMode::Patrol)
-	{
-		float maxRadius = 10.0f; // 몬스터가 이동할 수 있는 최대 반경
-		_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, maxRadius);
-	}
-	else
-	{
-		NavigationSystem::GetInstance()->SetDestination(_agentIndex, _destPos, 10.f);
+		shared_ptr<Room> myRoom = room.load().lock();
+		if (myRoom)
+		{
+			myRoom->DoAsync(&Room::HandleServerAttack, attackPkt, target);
+		}
 	}
 }
 
@@ -363,5 +294,9 @@ void Monster::SendMovePacket()
 	GetPos()->set_z(agentPos.Z);
 	GetPos()->set_speed(GetAgentSpeed());
 
-	GRoom->DoAsync(&Room::HandleServerMove, GetPos());
+	shared_ptr<Room> myRoom = room.load().lock();
+	if (myRoom)
+	{
+		myRoom->DoAsync(&Room::HandleServerMove, GetPos());
+	}
 }

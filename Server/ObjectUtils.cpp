@@ -6,6 +6,13 @@
 
 atomic<int64> ObjectUtils::s_idGenerator = 1;
 
+int64 ObjectUtils::GetID()
+{
+	const int64 newId = s_idGenerator.fetch_add(1);
+
+	return newId;
+}
+
 std::shared_ptr<Player> ObjectUtils::CreatePlayer(shared_ptr<GameSession> session)
 {
 	const int64 newId = s_idGenerator.fetch_add(1);

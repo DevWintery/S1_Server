@@ -24,6 +24,26 @@ void Monster::Update()
 	{
 		return;
 	}
+	
+	if (_target.lock() != nullptr)
+	{
+		if (_target.lock()->IsDie())
+		{
+			SetState(Protocol::MONSTER_STATE_IDLE);
+			_target.reset();
+		}
+	}
+
+	shared_ptr<Room> myRoom = room.load().lock();
+	for (const auto& player : myRoom->GetPlayers())
+	{
+		if (player->IsDie())
+		{
+			continue;
+		}
+
+		SetTarget(player);
+	}
 
 	SendMovePacket();
 
@@ -44,9 +64,16 @@ void Monster::Update()
 
 void Monster::TakeDamage(float damage)
 {
-	_hp -= damage;
+	Object::TakeDamage(damage);
 
-	SetState(Protocol::MONSTER_STATE_ATTACK);
+	if(_isDie)
+	{
+		SetState(Protocol::MONSTER_STATE_DIE);
+	}
+	else
+	{
+		SetState(Protocol::MONSTER_STATE_ATTACK);
+	}
 }
 
 void Monster::SetMoveMode(EMoveMode moveMode)
@@ -86,6 +113,10 @@ void Monster::SetTarget(shared_ptr<Object> object)
 FVector Monster::GetAgentPos()
 {
 	const dtCrowdAgent* agent = NavigationSystem::GetInstance()->GetAgent(_agentIndex);
+	if (agent == nullptr)
+	{
+		return FVector::Zero();
+	}
 
 	return Utils::RecastToUE5_Meter(FVector(agent->npos[0], agent->npos[1], agent->npos[2]));
 }
@@ -93,6 +124,10 @@ FVector Monster::GetAgentPos()
 float Monster::GetAgentSpeed()
 {
 	const dtCrowdAgent* agent = NavigationSystem::GetInstance()->GetAgent(_agentIndex);
+	if (agent == nullptr)
+	{
+		return 10.f;
+	}
 
 	return agent->params.maxSpeed;
 }
@@ -252,9 +287,9 @@ void Monster::UpdateAttack()
 	nextAttackTickAfter = GetTickCount64() + ATTACK_TICK;
 
 	shared_ptr<Object> target = _target.lock();
-
 	if (target == nullptr)
 	{
+		SetState(Protocol::MONSTER_STATE_IDLE);
 		return;
 	}
 

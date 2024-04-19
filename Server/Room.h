@@ -19,6 +19,8 @@ public:
 	const std::string& GetRoomName() { return _name; }
 	const std::string& GetRoomMapName() { return _map; }
 
+	std::vector<shared_ptr<Object>> GetPlayers();
+
 public:
 	bool EnterRoom(shared_ptr<Player> player, int64 roomId);
 

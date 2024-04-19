@@ -17,14 +17,19 @@ public:
 
 public:
 	bool IsPlayer() { return _isPlayer; }
+	bool IsDie() { return _isDie; }
 
 public:
 	virtual void Initialize() { }
 	virtual void Update() { }
-	virtual void TakeDamage(float damage) {}
+	virtual void TakeDamage(float damage);
 
 protected:
 	bool _isPlayer = false;
+
+	//TEMP
+	bool _isDie = false;
+	float _hp = 100.f;
 
 protected:
 	Protocol::ObjectInfo* objectInfo;

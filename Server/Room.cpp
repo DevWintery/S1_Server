@@ -23,6 +23,21 @@ Room::~Room()
 
 }
 
+std::vector<std::shared_ptr<Object>> Room::GetPlayers()
+{
+	std::vector<shared_ptr<Object>> players;
+
+	for (const auto& object : _objects)
+	{
+		if (object.second->GetInfo()->creature_type() == Protocol::CREATURE_TYPE_PLAYER)
+		{
+			players.push_back(object.second);
+		}
+	}
+
+	return players;
+}
+
 bool Room::EnterRoom(shared_ptr<Player> player, int64 roomId)
 {
 	//AddObject(player);
@@ -203,18 +218,6 @@ void Room::HandleMove(Protocol::C_MOVE pkt)
 		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(movePkt);
 		Broadcast(sendBuffer);
 	}
-
-	//플레이어가 이동했다면 몬스터의 스테이트도 체크한다.
-	for (const auto& object : _objects)
-	{
-		if (object.second->GetInfo()->creature_type() != Protocol::CREATURE_TYPE_MONSTER)
-		{
-			continue;
-		}
-
-		shared_ptr<Monster> monster = dynamic_pointer_cast<Monster>(object.second);
-		monster->SetTarget(player);
-	}
 }
 
 void Room::HandleServerMove(Protocol::PosInfo* posInfo)
@@ -343,7 +346,7 @@ void Room::HandleInteract(Protocol::C_INTERACT pkt)
 					}
 				});
 
-			DoTimer(30000, [this, pkt]()
+			DoTimer(36000, [this, pkt]()
 				{
 					_step += 1;
 

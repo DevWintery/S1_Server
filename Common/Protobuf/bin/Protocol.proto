@@ -4,8 +4,6 @@ package Protocol;
 import "Enum.proto";
 import "Struct.proto";
 
-//브랜치 테스트 : DEVELOP
-
 message C_LOGIN
 {
 }

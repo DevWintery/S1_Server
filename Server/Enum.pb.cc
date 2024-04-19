@@ -37,18 +37,18 @@ const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "\031\n\025CREATURE_TYPE_MONSTER\020\002\022\025\n\021CREATURE_T"
   "YPE_NPC\020\003*I\n\tMoveState\022\023\n\017MOVE_STATE_NON"
   "E\020\000\022\023\n\017MOVE_STATE_IDLE\020\001\022\022\n\016MOVE_STATE_R"
-  "UN\020\002*_\n\016AnimationState\022\030\n\024ANIMATION_STAT"
+  "UN\020\002*x\n\016AnimationState\022\030\n\024ANIMATION_STAT"
   "E_NONE\020\000\022\027\n\023ANIMATION_STATE_AIM\020\001\022\032\n\026ANI"
-  "MATION_STATE_RELOAD\020\002*o\n\014MonsterState\022\026\n"
-  "\022MONSTER_STATE_IDLE\020\000\022\026\n\022MONSTER_STATE_M"
-  "OVE\020\001\022\030\n\024MONSTER_STATE_ATTACK\020\002\022\025\n\021MONST"
-  "ER_STATE_DIE\020\003*A\n\014InteractType\022\026\n\022INTERA"
-  "CT_NEXT_STEP\020\000\022\031\n\025INTERACT_SPAWN_OBJECT\020"
-  "\001b\006proto3"
+  "MATION_STATE_RELOAD\020\002\022\027\n\023ANIMATION_STATE"
+  "_DIE\020\003*o\n\014MonsterState\022\026\n\022MONSTER_STATE_"
+  "IDLE\020\000\022\026\n\022MONSTER_STATE_MOVE\020\001\022\030\n\024MONSTE"
+  "R_STATE_ATTACK\020\002\022\025\n\021MONSTER_STATE_DIE\020\003*"
+  "A\n\014InteractType\022\026\n\022INTERACT_NEXT_STEP\020\000\022"
+  "\031\n\025INTERACT_SPAWN_OBJECT\020\001b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 609, descriptor_table_protodef_Enum_2eproto,
+    false, false, 634, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -118,6 +118,7 @@ bool AnimationState_IsValid(int value) {
     case 0:
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;

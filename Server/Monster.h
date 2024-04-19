@@ -62,8 +62,7 @@ private:
 	Protocol::MonsterState _state = Protocol::MONSTER_STATE_IDLE;
 	weak_ptr<Object> _target;
 
-	//TEMP
-	float _hp = 100.f;
+
 
 	int _agentIndex = -1;
 };

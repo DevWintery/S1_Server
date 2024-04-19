@@ -29,6 +29,7 @@ enum AnimationState
 	ANIMATION_STATE_NONE = 0;
 	ANIMATION_STATE_AIM = 1;
 	ANIMATION_STATE_RELOAD = 2;
+	ANIMATION_STATE_DIE = 3;
 }
 
 enum MonsterState

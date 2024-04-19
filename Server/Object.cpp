@@ -26,3 +26,18 @@ void Object::SetPos(const FVector& pos)
 	posInfo->set_y(pos.Y);
 	posInfo->set_z(pos.Z);
 }
+
+void Object::TakeDamage(float damage)
+{
+	if (_isDie)
+	{
+		return;
+	}
+
+	_hp -= damage;
+
+	if (0 >= _hp)
+	{
+		_isDie = true;
+	}
+}

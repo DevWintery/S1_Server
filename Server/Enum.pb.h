@@ -131,12 +131,13 @@ enum AnimationState : int {
   ANIMATION_STATE_NONE = 0,
   ANIMATION_STATE_AIM = 1,
   ANIMATION_STATE_RELOAD = 2,
+  ANIMATION_STATE_DIE = 3,
   AnimationState_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   AnimationState_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool AnimationState_IsValid(int value);
 constexpr AnimationState AnimationState_MIN = ANIMATION_STATE_NONE;
-constexpr AnimationState AnimationState_MAX = ANIMATION_STATE_RELOAD;
+constexpr AnimationState AnimationState_MAX = ANIMATION_STATE_DIE;
 constexpr int AnimationState_ARRAYSIZE = AnimationState_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* AnimationState_descriptor();

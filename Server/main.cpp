@@ -33,25 +33,37 @@ void DoWorkerJob(shared_ptr<ServerService>& service)
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	srand(time(nullptr));
 
 	ServerPacketHandler::Init();
+	std::cout << "ServerPacketHandler Initialize" << std::endl;
 
-#if _DEBUG
-	std::wstring ip = L"192.168.1.3";
-	NavigationSystem::GetInstance()->Init("F:\\S1\\Server\\Hanger.bin");
-#else
-	std::wstring ip = L"127.0.0.1";
-	NavigationSystem::GetInstance()->Init("Hanger.bin");
-#endif
+	std::size_t len = std::strlen(argv[1]);
+	std::wstring wstr(len, L' ');  // 충분한 크기의 와이드 문자열을 생성합니다.
+	std::mbstowcs(&wstr[0], argv[1], len);  // 멀티바이트를 와이드 문자로 변환합니다.
+
+	std::wstring ip = wstr;
+	std::string mapName = argv[2];
+
+//#if _DEBUG
+//	std::wstring ip = L"192.168.1.3";
+//	NavigationSystem::GetInstance()->Init("F:\\S1\\Server\\Hanger.bin");
+//#else
+//	std::wstring ip = L"127.0.0.1";
+//	NavigationSystem::GetInstance()->Init("F:\\S1\\Server\\Hanger.bin");
+//#endif
+
+	NavigationSystem::GetInstance()->Init(mapName);
+
 
 	shared_ptr<ServerService> service = std::make_shared<ServerService>(
 		NetAddress(ip, 7777),
 		make_shared<IocpCore>(),
 		make_shared<GameSession>, // TODO : SessionManager 등
 		100);
+	std::cout << "Service Created." << std::endl;
 
 	ASSERT_CRASH(service->Start());
 

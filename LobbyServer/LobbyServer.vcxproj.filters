@@ -3,12 +3,24 @@
   <ItemGroup>
     <ClCompile Include="LobbyServer.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Room.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
+    <ClCompile Include="RoomManager.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Room.h">
+      <Filter>Content</Filter>
+    </ClInclude>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RoomManager.h">
+      <Filter>Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Network">
+    <Filter Include="Content">
       <UniqueIdentifier>{b97ce204-f3d2-431e-a4bb-1538b424ad39}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

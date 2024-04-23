@@ -24,11 +24,11 @@ RoomManager::RoomManager():
 
 }
 
-int RoomManager::CreateRoom(const std::wstring& name)
+int RoomManager::CreateRoom(const std::wstring& name, const std::wstring& player_name, const std::wstring& room_ip)
 {
 	std::lock_guard<std::mutex> lock(mtx);
 	int roomId = nextRoomId++;
-	rooms[roomId] = Room(roomId, name);
+	rooms[roomId] = Room(roomId, name, player_name, room_ip);
 	return roomId;
 }
 
@@ -48,7 +48,7 @@ bool RoomManager::JoinRoom(int roomId, const std::wstring& playerName)
 {
 	std::lock_guard<std::mutex> lock(mtx);
 	auto it = rooms.find(roomId);
-	if (it != rooms.end() && !it->second.isGameStarted) 
+	if (it != rooms.end()) 
 	{
 		it->second.players.push_back(playerName);
 		return true;
@@ -56,14 +56,12 @@ bool RoomManager::JoinRoom(int roomId, const std::wstring& playerName)
 	return false;
 }
 
-pplx::task<bool> RoomManager::StartGame(int roomId, const std::wstring& args)
+pplx::task<bool> RoomManager::StartRoom(int roomId, const std::wstring& args)
 {
 	std::lock_guard<std::mutex> lock(mtx);
 	auto it = rooms.find(roomId);
-	if (it != rooms.end() && !it->second.isGameStarted) 
+	if (it != rooms.end()) 
 	{
-		it->second.isGameStarted = true;
-
 		WCHAR path[MAX_PATH];
 		if (GetModuleFileName(NULL, path, MAX_PATH) == 0) 
 		{

@@ -10,10 +10,10 @@ public:
 	RoomManager();
 
 public:
-	int CreateRoom(const std::wstring& name);
+	int CreateRoom(const std::wstring& name, const std::wstring& player_name, const std::wstring& room_ip);
 	web::json::value ListRooms();
 	bool JoinRoom(int roomId, const std::wstring& playerName);
-	pplx::task<bool> StartGame(int roomId, const std::wstring& args);
+	pplx::task<bool> StartRoom(int roomId, const std::wstring& args);
 
 private:
 	std::unordered_map<int, Room> rooms;

@@ -1,16 +1,87 @@
 #include "pch.h"
-#include "RoomManager.h"
 #include <cpprest/http_listener.h>
 #include <sstream>
+#include "RoomManager.h"
+
+RoomManager GManager;
 
 using namespace web;
 using namespace web::http;
 using namespace web::http::experimental::listener;
 
+
+// 방 생성에 대한 POST 요청
+pplx::task<void> PostCreateRoom(http_request request)
+{
+	request.extract_json().then([request](json::value json_val)
+		{
+			std::wstring room_name = json_val[U("name")].as_string();
+			std::wstring map_name = json_val[U("map_name")].as_string();
+			std::wstring player_name = json_val[U("player_name")].as_string();
+			std::wstring room_ip = json_val[U("room_ip")].as_string();
+
+			int room_id = GManager.CreateRoom(room_name, player_name, room_ip);
+
+			std::wstring args = room_ip + L" " + map_name;
+			GManager.StartRoom(room_id, args);
+
+			json::value response_data;
+			response_data[U("room_id")] = json::value::number(room_id);
+			return request.reply(status_codes::OK, response_data);
+		}).wait();
+
+	return pplx::task_from_result();
+}
+
+pplx::task<void> PostJoinRoom(http_request request)
+{
+	request.extract_json().then([request](json::value json_val)
+		{
+			int room_id = json_val[U("id")].as_integer();
+			std::wstring player_name = json_val[U("player_name")].as_string();
+
+			if (GManager.JoinRoom(room_id, player_name) == false)
+			{
+				return pplx::task_from_result();
+			}
+
+			json::value response_data;
+			response_data[U("successed")] = json::value::boolean(true);
+			return request.reply(status_codes::OK, response_data);
+		}).wait();
+
+	return pplx::task_from_result();
+}
+
+pplx::task<void> PostHandler(http_request request)
+{
+	if (request.relative_uri().path() == U("/rooms"))
+	{
+		PostCreateRoom(request);
+	}
+
+	if (request.relative_uri().path() == U("/join"))
+	{
+		PostJoinRoom(request);
+	}
+
+	return pplx::task_from_result();
+}
+
+// 방 조회에 대한 GET 요청
+pplx::task<void> GetRooms(http_request request)
+{
+	if (request.relative_uri().path() == U("/rooms"))
+	{
+		auto response_data = GManager.ListRooms();
+		request.reply(status_codes::OK, response_data);
+	}
+
+	return pplx::task_from_result();
+}
+
 int main(int argc, char* argv[])
 {
-	RoomManager manager;
-
 	std::size_t len = std::strlen(argv[1]);
 	std::wstring wstr(len, L' ');  // 충분한 크기의 와이드 문자열을 생성합니다.
 	std::mbstowcs(&wstr[0], argv[1], len);  // 멀티바이트를 와이드 문자로 변환합니다.
@@ -20,78 +91,8 @@ int main(int argc, char* argv[])
 	auto addr = uri.to_uri().to_string();
 	http_listener listener(addr);
 
-	listener.support(methods::POST, [&manager](http_request request)
-		{
-			// 방 생성에 대한 POST 요청
-			if (request.relative_uri().path() == U("/rooms"))
-			{
-				request.extract_json().then([&manager, request](json::value json_val)
-					{
-						auto room_name = json_val[U("name")].as_string();
-						int room_id = manager.CreateRoom(room_name);
-						json::value response_data;
-						response_data[U("room_id")] = json::value::number(room_id);
-						return request.reply(status_codes::OK, response_data);
-					}).then([](pplx::task<void> t)
-						{
-							try
-							{
-								t.get();
-							}
-							catch (const std::exception& e)
-							{
-								std::cerr << "An error occurred: " << e.what() << std::endl;
-							}
-						});
-			}
-
-			//방 시작에 대한 POST 요청
-			if (request.relative_uri().path() == U("/startRoom"))
-			{
-				request.extract_json().then([&manager, request](json::value json_val)
-					{
-						auto room_id = json_val[U("id")].as_integer();
-						std::wstring args = json_val[U("args")].as_string();
-						bool result = manager.StartGame(room_id, args).wait();
-
-						//args 규칙
-						//0 - ip
-						//1 - map Name
-
-						std::wstringstream ss(args);
-						std::wstring ip, mapName;
-
-						ss >> ip >> mapName;
-
-						json::value response_data;
-						response_data[U("sucess")] = json::value::boolean(result);
-						response_data[U("connect-ip")] = json::value::string(ip);
-						response_data[U("connect-port")] = json::value::number(7777);
-						response_data[U("map-name")] = json::value::string(mapName);
-						return request.reply(status_codes::OK, response_data);
-					}).then([](pplx::task<void> t)
-						{
-							try
-							{
-								t.get();
-							}
-							catch (const std::exception& e)
-							{
-								std::wcout << L"An error occurred: " << e.what() << std::endl;
-							}
-						});
-			}
-		});
-
-	// 방 조회에 대한 GET 요청
-	listener.support(methods::GET, [&manager](http_request request)
-		{
-			if (request.relative_uri().path() == U("/rooms"))
-			{
-				auto response_data = manager.ListRooms();
-				request.reply(status_codes::OK, response_data);
-			}
-		});
+	listener.support(methods::POST, PostHandler);
+	listener.support(methods::GET, GetRooms);
 
 	try
 	{

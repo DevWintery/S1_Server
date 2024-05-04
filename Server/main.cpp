@@ -9,7 +9,6 @@
 #include "Room.h"
 #include "NavigationSystem.h"
 #include "JsonUtil.h"
-#include "RoomManager.h"
 
 enum
 {
@@ -43,9 +42,9 @@ int main(int argc, char* argv[])
 	std::size_t len = std::strlen(argv[1]);
 	std::wstring wstr(len, L' ');  // 충분한 크기의 와이드 문자열을 생성합니다.
 	std::mbstowcs(&wstr[0], argv[1], len);  // 멀티바이트를 와이드 문자로 변환합니다.
-
 	std::wstring ip = wstr;
-	std::string mapName = argv[2];
+
+	//std::string mapName = argv[2];
 
 //#if _DEBUG
 //	std::wstring ip = L"192.168.1.3";
@@ -55,7 +54,7 @@ int main(int argc, char* argv[])
 //	NavigationSystem::GetInstance()->Init("F:\\S1\\Server\\Hanger.bin");
 //#endif
 
-	NavigationSystem::GetInstance()->Init(mapName);
+	//NavigationSystem::GetInstance()->Init(mapName);
 
 
 	shared_ptr<ServerService> service = std::make_shared<ServerService>(

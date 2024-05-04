@@ -4,36 +4,9 @@ package Protocol;
 import "Enum.proto";
 import "Struct.proto";
 
-message C_LOGIN
-{
-}
-
-message S_LOGIN
-{
-    bool success = 1;
-}
-
-
-message C_CREATE_ROOM
-{
-    RoomInfo room_info = 1;
-    string player_name = 2;
-}
-
-message C_ROOM_LIST
-{
-
-}
-
-message S_ROOM_LIST
-{
-    repeated RoomInfo room_infos = 1;
-}
-
 message C_ENTER_ROOM
 {
-    int64 room_id = 1;
-    string player_name = 2;
+    string player_name = 1;
 }
 
 message S_ENTER_ROOM
@@ -45,12 +18,22 @@ message S_ENTER_ROOM
 message C_ENTER_GAME
 {
     int64 room_id = 1;
+    string map_name = 2;
 }
 
 message S_ENTER_GAME
 {
-    bool success = 1;	
-    ObjectInfo player = 2;
+    string map_name = 1;
+}
+
+message C_GAME_INIT
+{
+
+}
+
+message S_GAME_INIT
+{
+    ObjectInfo player = 1;
 }
 
 message C_LEAVE_GAME

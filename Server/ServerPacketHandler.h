@@ -20,40 +20,35 @@ extern PacketHandlerFunc GPacketHandler[UINT16_MAX];
 
 enum : uint16
 {
-	PKT_C_LOGIN = 1000,
-	PKT_S_LOGIN = 1001,
-	PKT_C_CREATE_ROOM = 1002,
-	PKT_C_ROOM_LIST = 1003,
-	PKT_S_ROOM_LIST = 1004,
-	PKT_C_ENTER_ROOM = 1005,
-	PKT_S_ENTER_ROOM = 1006,
-	PKT_C_ENTER_GAME = 1007,
-	PKT_S_ENTER_GAME = 1008,
-	PKT_C_LEAVE_GAME = 1009,
-	PKT_S_LEAVE_GAME = 1010,
-	PKT_S_SPAWN = 1011,
-	PKT_S_DESPAWN = 1012,
-	PKT_C_MOVE = 1013,
-	PKT_S_MOVE = 1014,
-	PKT_S_MONSTER_STATE = 1015,
-	PKT_C_ANIMATION_STATE = 1016,
-	PKT_S_ANIMATION_STATE = 1017,
-	PKT_C_ATTACK = 1018,
-	PKT_S_ATTACK = 1019,
-	PKT_C_HIT = 1020,
-	PKT_S_HIT = 1021,
-	PKT_C_INTERACT = 1022,
-	PKT_S_INTERACT = 1023,
+	PKT_C_ENTER_ROOM = 1000,
+	PKT_S_ENTER_ROOM = 1001,
+	PKT_C_ENTER_GAME = 1002,
+	PKT_S_ENTER_GAME = 1003,
+	PKT_C_GAME_INIT = 1004,
+	PKT_S_GAME_INIT = 1005,
+	PKT_C_LEAVE_GAME = 1006,
+	PKT_S_LEAVE_GAME = 1007,
+	PKT_S_SPAWN = 1008,
+	PKT_S_DESPAWN = 1009,
+	PKT_C_MOVE = 1010,
+	PKT_S_MOVE = 1011,
+	PKT_S_MONSTER_STATE = 1012,
+	PKT_C_ANIMATION_STATE = 1013,
+	PKT_S_ANIMATION_STATE = 1014,
+	PKT_C_ATTACK = 1015,
+	PKT_S_ATTACK = 1016,
+	PKT_C_HIT = 1017,
+	PKT_S_HIT = 1018,
+	PKT_C_INTERACT = 1019,
+	PKT_S_INTERACT = 1020,
 };
 
 
 // Custom Handlers
 bool Handle_INVALID(SharedPacketSession& session, BYTE* buffer, int32 len);
-bool Handle_C_LOGIN(SharedPacketSession& session, Protocol::C_LOGIN&pkt);
-bool Handle_C_CREATE_ROOM(SharedPacketSession& session, Protocol::C_CREATE_ROOM&pkt);
-bool Handle_C_ROOM_LIST(SharedPacketSession& session, Protocol::C_ROOM_LIST&pkt);
 bool Handle_C_ENTER_ROOM(SharedPacketSession& session, Protocol::C_ENTER_ROOM&pkt);
 bool Handle_C_ENTER_GAME(SharedPacketSession& session, Protocol::C_ENTER_GAME&pkt);
+bool Handle_C_GAME_INIT(SharedPacketSession& session, Protocol::C_GAME_INIT&pkt);
 bool Handle_C_LEAVE_GAME(SharedPacketSession& session, Protocol::C_LEAVE_GAME&pkt);
 bool Handle_C_MOVE(SharedPacketSession& session, Protocol::C_MOVE&pkt);
 bool Handle_C_ANIMATION_STATE(SharedPacketSession& session, Protocol::C_ANIMATION_STATE&pkt);
@@ -68,11 +63,9 @@ public:
 	{
 		for (int32 i = 0; i < UINT16_MAX; i++)
 			GPacketHandler[i] = Handle_INVALID;
-		GPacketHandler[PKT_C_LOGIN] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_LOGIN > (Handle_C_LOGIN, session, buffer, len); };
-		GPacketHandler[PKT_C_CREATE_ROOM] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_CREATE_ROOM > (Handle_C_CREATE_ROOM, session, buffer, len); };
-		GPacketHandler[PKT_C_ROOM_LIST] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_ROOM_LIST > (Handle_C_ROOM_LIST, session, buffer, len); };
 		GPacketHandler[PKT_C_ENTER_ROOM] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_ENTER_ROOM > (Handle_C_ENTER_ROOM, session, buffer, len); };
 		GPacketHandler[PKT_C_ENTER_GAME] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_ENTER_GAME > (Handle_C_ENTER_GAME, session, buffer, len); };
+		GPacketHandler[PKT_C_GAME_INIT] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_GAME_INIT > (Handle_C_GAME_INIT, session, buffer, len); };
 		GPacketHandler[PKT_C_LEAVE_GAME] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_LEAVE_GAME > (Handle_C_LEAVE_GAME, session, buffer, len); };
 		GPacketHandler[PKT_C_MOVE] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_MOVE > (Handle_C_MOVE, session, buffer, len); };
 		GPacketHandler[PKT_C_ANIMATION_STATE] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_ANIMATION_STATE > (Handle_C_ANIMATION_STATE, session, buffer, len); };
@@ -86,10 +79,9 @@ public:
 		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
 		return GPacketHandler[header->id](session, buffer, len);
 	}
-	static SharedSendBuffer MakeSendBuffer(Protocol::S_LOGIN&pkt) { return MakeSendBuffer(pkt, PKT_S_LOGIN); }
-	static SharedSendBuffer MakeSendBuffer(Protocol::S_ROOM_LIST&pkt) { return MakeSendBuffer(pkt, PKT_S_ROOM_LIST); }
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_ENTER_ROOM&pkt) { return MakeSendBuffer(pkt, PKT_S_ENTER_ROOM); }
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_ENTER_GAME&pkt) { return MakeSendBuffer(pkt, PKT_S_ENTER_GAME); }
+	static SharedSendBuffer MakeSendBuffer(Protocol::S_GAME_INIT&pkt) { return MakeSendBuffer(pkt, PKT_S_GAME_INIT); }
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_LEAVE_GAME&pkt) { return MakeSendBuffer(pkt, PKT_S_LEAVE_GAME); }
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_SPAWN&pkt) { return MakeSendBuffer(pkt, PKT_S_SPAWN); }
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_DESPAWN&pkt) { return MakeSendBuffer(pkt, PKT_S_DESPAWN); }

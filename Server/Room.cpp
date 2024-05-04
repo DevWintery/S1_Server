@@ -8,14 +8,10 @@
 #include "Monster.h"
 #include "NavigationSystem.h"
 
+shared_ptr<Room> GRoom = make_shared<Room>();
+
 Room::Room()
 {
-}
-
-Room::Room(const std::string& name, const std::string& map):
-	_name(name), _map(map)
-{
-
 }
 
 Room::~Room()
@@ -38,116 +34,99 @@ std::vector<std::shared_ptr<Object>> Room::GetPlayers()
 	return players;
 }
 
-bool Room::EnterRoom(shared_ptr<Player> player, int64 roomId)
+bool Room::EnterRoom(shared_ptr<Player> player)
 {
-	//AddObject(player);
-	_room_objects.push_back(player);
+	AddObject(player);
 
 	Protocol::S_ENTER_ROOM pkt;
 
-	pkt.set_room_id(roomId);
-
-	for(const auto& obj : _room_objects)
+	for(const auto& obj : _objects)
 	{
-		Protocol::ObjectInfo* info = pkt.add_players();
-		info->set_player_name(obj->GetInfo()->player_name());
+		if(obj.second->GetInfo()->creature_type() == Protocol::CREATURE_TYPE_PLAYER)
+		{
+			Protocol::ObjectInfo* info = pkt.add_players();
+			info->set_player_name(obj.second->GetInfo()->player_name());
+
+			std::cout << obj.second->GetInfo()->player_name() << std::endl;
+		}
 	}
 
 	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
 	
-	for (auto& item : _room_objects)
-	{
-		shared_ptr<Player> player = dynamic_pointer_cast<Player>(item);
-		if (player == nullptr)
-			continue;
-
-		if (shared_ptr<GameSession> session = player->GetSession().lock())
-		{
-			session->Send(sendBuffer);
-		}
-	}
+	Broadcast(sendBuffer);
 
 	return true;
 }
 
-bool Room::RoomSetting()
+bool Room::EnterGame(Protocol::C_ENTER_GAME pkt)
+{
+	senarioStep = 0;
+	_mapName = pkt.map_name();
+
+	Protocol::S_ENTER_GAME enterGamePkt;
+	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
+
+	Broadcast(sendBuffer);
+
+	return true;
+}
+
+bool Room::GameInit(Protocol::C_GAME_INIT pkt)
 {
 	if (_initialize)
 	{
 		return true;
 	}
 
-	RoomInitialize();
+	FVector StartPos = JsonUtil::ParsePlayerJson(_mapName + "_Player.json");
 
-	return true;
-}
-
-bool Room::EnterGame()
-{
-	//GRoom->DoAsync(&Room::RoomSetting);
-	//bool success = AddObject(object);
-
-	for (const auto& obj : _room_objects)
+	for (const auto& obj : _objects)
 	{
-		shared_ptr<Object> object = obj;
+		shared_ptr<Object> object = obj.second;
 
-		AddObject(object);
-
-		FVector StartPos = FVector(-10589.000000, -11471.000000, 102.020608);
+		//시작 위치 세팅
 		object->GetPos()->set_x(StartPos.X + Utils::GetRandom(-250.f, 250.f));
 		object->GetPos()->set_y(StartPos.Y + Utils::GetRandom(-250.f, 250.f));
 		object->GetPos()->set_z(StartPos.Z);
 		object->GetPos()->set_yaw(Utils::GetRandom(0.f, 100.f));
 
-		//플레이어 전부 입장
+		//플레이어 생성
+		Protocol::S_GAME_INIT initPkt;
 		if (auto player = dynamic_pointer_cast<Player>(object))
 		{
-			Protocol::S_ENTER_GAME enterGamePkt;
-			enterGamePkt.set_success(true);
-
 			Protocol::ObjectInfo* playerInfo = new Protocol::ObjectInfo();
 			playerInfo->CopyFrom(*object->GetInfo());
-			enterGamePkt.set_allocated_player(playerInfo);
+			initPkt.set_allocated_player(playerInfo);
 
-			shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
-			if (auto session = player->GetSession().lock())
+			shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(initPkt);
+			if(auto session = player->GetSession().lock())
 				session->Send(sendBuffer);
 		}
 
-		//입장했으면 알리고
 		{
 			Protocol::S_SPAWN spawnPkt;
 
-			Protocol::ObjectInfo* objectInfo = spawnPkt.add_objects();
-			objectInfo->CopyFrom(*object->GetInfo());
+			Protocol::ObjectInfo* objInfo = spawnPkt.add_objects();
+			objInfo->CopyFrom(*object->GetInfo());
 
 			shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
 			Broadcast(sendBuffer, object->GetInfo()->object_id());
 		}
-
-		// 기존 입장한 플레이어 목록을 신입 플레이어한테 전송해준다
-		if (auto player = dynamic_pointer_cast<Player>(object))
-		{
-			Protocol::S_SPAWN spawnPkt;
-
-			for (auto& item : _objects)
-			{
-				/*if (item.second->IsPlayer() == false)
-					continue;*/
-
-				Protocol::ObjectInfo* objInfo = spawnPkt.add_objects();
-				objInfo->CopyFrom(*item.second->GetInfo());
-			}
-
-			shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-			if (auto session = player->GetSession().lock())
-				session->Send(sendBuffer);
-		}
 	}
 
-	_room_objects.clear();
+#if _DEBUG
+	std::vector<ns::Monster> monsters = JsonUtil::ParseJson("F:\\S1\\Server\\Hanger.json", 0);
+#else
+	std::vector<ns::Monster> monsterInfos = JsonUtil::ParseJson(_mapName + "_Monster.json", senarioStep);
+#endif
 
-	RoomSetting();
+	//그리고 맵 세팅
+	for (const auto& monster : monsterInfos)
+	{
+		SpawnMonster(monster);
+	}
+
+	_initialize = true;
 
 	return true;
 }
@@ -184,11 +163,6 @@ bool Room::LeaveGame(shared_ptr<Object> object)
 	}
 
 	return success;
-}
-
-bool Room::HandleEnterPlayer(shared_ptr<Player> player)
-{
-	return EnterGame();
 }
 
 bool Room::HandleLeavePlayer(shared_ptr<Player> player)

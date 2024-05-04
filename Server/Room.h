@@ -12,25 +12,19 @@ class Room : public JobQueue
 {
 public:
 	Room();
-	Room(const std::string& name, const std::string& map);
 	virtual ~Room();
 
 public:
-	const std::string& GetRoomName() { return _name; }
-	const std::string& GetRoomMapName() { return _map; }
-
 	std::vector<shared_ptr<Object>> GetPlayers();
 
 public:
-	bool EnterRoom(shared_ptr<Player> player, int64 roomId);
+	bool EnterRoom(shared_ptr<Player> player);
 
 public:
-	bool RoomSetting();
-
-	bool EnterGame();
+	bool EnterGame(Protocol::C_ENTER_GAME pkt);
+	bool GameInit(Protocol::C_GAME_INIT pkt);
 	bool LeaveGame(shared_ptr<Object> object);
 
-	bool HandleEnterPlayer(shared_ptr<Player> player);
 	bool HandleLeavePlayer(shared_ptr<Player> player);
 	void HandleMove(Protocol::C_MOVE pkt);
 	void HandleServerMove(Protocol::PosInfo* posInfo);
@@ -67,8 +61,6 @@ private:
 	void Broadcast(shared_ptr<SendBuffer> sendBuffer, uint64 exceptId = 0);
 
 private:
-	//TEMP
-	std::vector<shared_ptr<Object>> _room_objects;
 
 	unordered_map<uint64, shared_ptr<Object>> _objects;
 
@@ -80,5 +72,9 @@ private:
 
 private:
 	std::string _name;
-	std::string _map;
+	std::string _mapName;
+
+	int senarioStep = 0;
 };
+
+extern shared_ptr<Room> GRoom;

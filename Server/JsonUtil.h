@@ -41,6 +41,16 @@ namespace ns
 class JsonUtil
 {
 public:
+	static FVector ParsePlayerJson(std::string fileName)
+	{
+		json j;
+		ParseJson(j, fileName);
+
+		ns::Location loc = j["startPos"].get<ns::Location>();
+
+		return FVector(loc.x, loc.y, loc.z);
+	}
+
 	static std::vector<ns::Monster> ParseJson(std::string fileName)
 	{
 		json j;

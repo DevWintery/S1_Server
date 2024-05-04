@@ -98,9 +98,6 @@
     <ClCompile Include="Singleton.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="RoomManager.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Enum.pb.h">
@@ -205,9 +202,6 @@
     </ClInclude>
     <ClInclude Include="Singleton.h">
       <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="RoomManager.h">
-      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

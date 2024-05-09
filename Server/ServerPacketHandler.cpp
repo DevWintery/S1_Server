@@ -46,96 +46,49 @@ bool Handle_C_LEAVE_GAME(SharedPacketSession& session, Protocol::C_LEAVE_GAME& p
 	if (player == nullptr)
 		return false;
 
-	shared_ptr<Room> room = player->room.load().lock();
-	if (room == nullptr)
-		return false;
-
-	room->DoAsync(&Room::HandleLeavePlayer, player);
+	GRoom->DoAsync(&Room::HandleLeavePlayer, player);
 
 	return true;
 }
 
 bool Handle_C_MOVE(SharedPacketSession& session, Protocol::C_MOVE& pkt)
 {
-	auto gameSession = static_pointer_cast<GameSession>(session);
-
-	shared_ptr<Player> player = gameSession->player.load();
-	if (player == nullptr)
-		return false;
-
-	shared_ptr<Room> room = player->room.load().lock();
-	if (room == nullptr)
-		return false;
-
-	room->DoAsync(&Room::HandleMove, pkt);
+	GRoom->DoAsync(&Room::HandleMove, pkt);
 
 	return true;
 }
 
 bool Handle_C_ANIMATION_STATE(SharedPacketSession& session, Protocol::C_ANIMATION_STATE& pkt)
 {
-	auto gameSession = static_pointer_cast<GameSession>(session);
-
-	shared_ptr<Player> player = gameSession->player.load();
-	if (player == nullptr)
-		return false;
-
-	shared_ptr<Room> room = player->room.load().lock();
-	if (room == nullptr)
-		return false;
-
-	room->DoAsync(&Room::HandleAnimationState, pkt);
+	GRoom->DoAsync(&Room::HandleAnimationState, pkt);
 
 	return true;
 }
 
 bool Handle_C_ATTACK(SharedPacketSession& session, Protocol::C_ATTACK& pkt)
 {
-	auto gameSession = static_pointer_cast<GameSession>(session);
-
-	shared_ptr<Player> player = gameSession->player.load();
-	if (player == nullptr)
-		return false;
-
-	shared_ptr<Room> room = player->room.load().lock();
-	if (room == nullptr)
-		return false;
-
-	room->DoAsync(&Room::HandleAttack, pkt);
+	GRoom->DoAsync(&Room::HandleAttack, pkt);
 
 	return true;
 }
 
 bool Handle_C_HIT(SharedPacketSession& session, Protocol::C_HIT& pkt)
 {
-	auto gameSession = static_pointer_cast<GameSession>(session);
-
-	shared_ptr<Player> player = gameSession->player.load();
-	if (player == nullptr)
-		return false;
-
-	shared_ptr<Room> room = player->room.load().lock();
-	if (room == nullptr)
-		return false;
-
-	room->DoAsync(&Room::HandleHit, pkt);
+	GRoom->DoAsync(&Room::HandleHit, pkt);
 
 	return true;
 }
 
 bool Handle_C_INTERACT(SharedPacketSession& session, Protocol::C_INTERACT& pkt)
 {
-	auto gameSession = static_pointer_cast<GameSession>(session);
+	GRoom->DoAsync(&Room::HandleInteract, pkt);
 
-	shared_ptr<Player> player = gameSession->player.load();
-	if (player == nullptr)
-		return false;
+	return true;
+}
 
-	shared_ptr<Room> room = player->room.load().lock();
-	if (room == nullptr)
-		return false;
-
-	room->DoAsync(&Room::HandleInteract, pkt);
+bool Handle_C_CHANGE_WEAPON(SharedPacketSession& session, Protocol::C_CHANGE_WEAPON& pkt)
+{
+	GRoom->DoAsync(&Room::HandleChangeWeapon, pkt);
 
 	return true;
 }

@@ -44,19 +44,6 @@ int main(int argc, char* argv[])
 	std::mbstowcs(&wstr[0], argv[1], len);  // 멀티바이트를 와이드 문자로 변환합니다.
 	std::wstring ip = wstr;
 
-	//std::string mapName = argv[2];
-
-//#if _DEBUG
-//	std::wstring ip = L"192.168.1.3";
-//	NavigationSystem::GetInstance()->Init("F:\\S1\\Server\\Hanger.bin");
-//#else
-//	std::wstring ip = L"127.0.0.1";
-//	NavigationSystem::GetInstance()->Init("F:\\S1\\Server\\Hanger.bin");
-//#endif
-
-	//NavigationSystem::GetInstance()->Init(mapName);
-
-
 	shared_ptr<ServerService> service = std::make_shared<ServerService>(
 		NetAddress(ip, 7777),
 		make_shared<IocpCore>(),
@@ -65,6 +52,8 @@ int main(int argc, char* argv[])
 	std::cout << "Service Created." << std::endl;
 
 	ASSERT_CRASH(service->Start());
+
+	GRoom->UpdateRoom();
 
 	for (int32 i = 0; i < 10; i++)
 	{

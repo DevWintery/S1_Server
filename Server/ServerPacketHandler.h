@@ -41,6 +41,8 @@ enum : uint16
 	PKT_S_HIT = 1018,
 	PKT_C_INTERACT = 1019,
 	PKT_S_INTERACT = 1020,
+	PKT_C_CHANGE_WEAPON = 1021,
+	PKT_S_CHANGE_WEAPON = 1022,
 };
 
 
@@ -55,6 +57,7 @@ bool Handle_C_ANIMATION_STATE(SharedPacketSession& session, Protocol::C_ANIMATIO
 bool Handle_C_ATTACK(SharedPacketSession& session, Protocol::C_ATTACK&pkt);
 bool Handle_C_HIT(SharedPacketSession& session, Protocol::C_HIT&pkt);
 bool Handle_C_INTERACT(SharedPacketSession& session, Protocol::C_INTERACT&pkt);
+bool Handle_C_CHANGE_WEAPON(SharedPacketSession& session, Protocol::C_CHANGE_WEAPON&pkt);
 
 class ServerPacketHandler
 {
@@ -72,6 +75,7 @@ public:
 		GPacketHandler[PKT_C_ATTACK] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_ATTACK > (Handle_C_ATTACK, session, buffer, len); };
 		GPacketHandler[PKT_C_HIT] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_HIT > (Handle_C_HIT, session, buffer, len); };
 		GPacketHandler[PKT_C_INTERACT] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_INTERACT > (Handle_C_INTERACT, session, buffer, len); };
+		GPacketHandler[PKT_C_CHANGE_WEAPON] = [](SharedPacketSession& session, BYTE* buffer, int32 len) { return HandlePacket < Protocol::C_CHANGE_WEAPON > (Handle_C_CHANGE_WEAPON, session, buffer, len); };
 	}
 
 	static bool HandlePacket(SharedPacketSession& session, BYTE * buffer, int32 len)
@@ -91,6 +95,7 @@ public:
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_ATTACK&pkt) { return MakeSendBuffer(pkt, PKT_S_ATTACK); }
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_HIT&pkt) { return MakeSendBuffer(pkt, PKT_S_HIT); }
 	static SharedSendBuffer MakeSendBuffer(Protocol::S_INTERACT&pkt) { return MakeSendBuffer(pkt, PKT_S_INTERACT); }
+	static SharedSendBuffer MakeSendBuffer(Protocol::S_CHANGE_WEAPON&pkt) { return MakeSendBuffer(pkt, PKT_S_CHANGE_WEAPON); }
 
 private:
 	template<typename PacketType, typename ProcessFunc>

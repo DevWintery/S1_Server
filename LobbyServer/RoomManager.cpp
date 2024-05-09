@@ -86,3 +86,16 @@ pplx::task<bool> RoomManager::StartRoom(int roomId, const std::wstring& args)
 	}
 	return pplx::task_from_result(false);
 }
+
+pplx::task<bool> RoomManager::StartRoom(int roomId)
+{
+	std::lock_guard<std::mutex> lock(mtx);
+
+	auto it = rooms.find(roomId);
+	if (it != rooms.end())
+	{
+		rooms.erase(roomId);
+	}
+
+	return pplx::task_from_result(true);
+}

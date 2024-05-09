@@ -32,6 +32,22 @@ pplx::task<void> PostCreateRoom(http_request request)
 	return pplx::task_from_result();
 }
 
+pplx::task<void> PostStartRoom(http_request request)
+{
+	request.extract_json().then([request](json::value json_val)
+		{
+			int room_id = json_val[U("id")].as_integer();
+
+			GManager.StartRoom(room_id);
+
+			json::value response_data;
+			response_data[U("success")] = json::value::boolean(true);
+			return request.reply(status_codes::OK, response_data);
+		}).wait();
+
+		return pplx::task_from_result();
+}
+
 pplx::task<void> PostHandler(http_request request)
 {
 	if (request.relative_uri().path() == U("/rooms"))	
@@ -39,8 +55,14 @@ pplx::task<void> PostHandler(http_request request)
 		PostCreateRoom(request);
 	}
 
+	if (request.relative_uri().path() == U("/start_room"))
+	{
+		PostStartRoom(request);
+	}
+
 	return pplx::task_from_result();
 }
+
 
 // 방 조회에 대한 GET 요청
 pplx::task<void> GetRooms(http_request request)

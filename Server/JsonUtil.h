@@ -14,6 +14,7 @@ namespace ns
 
 	struct Monster
 	{
+		std::string attack_type;
 		std::string type;
 		Location location;
 		std::optional<Location> dest_location;
@@ -28,6 +29,7 @@ namespace ns
 
 	static void from_json(const json& j, Monster& monster)
 	{
+		monster.attack_type = j.at("attack_type").get<std::string>();
 		monster.type = j.at("type").get<std::string>();
 		monster.location = j.at("location").get<Location>();
 		if (j.contains("dest_location"))
@@ -64,6 +66,7 @@ public:
 			for (const auto& monster_json : step["monsters"]) 
 			{
 				ns::Monster monster = monster_json.get<ns::Monster>();
+				std::cout << "	Monster Attack Type: " << monster.attack_type << std::endl;
 				std::cout << "  Monster Type: " << monster.type << std::endl;
 				std::cout << "  Location: (" << monster.location.x << ", " << monster.location.y << ", " << monster.location.z << ")" << std::endl;
 				if (monster.dest_location) 
@@ -96,6 +99,7 @@ public:
 			for (const auto& monster_json : step["monsters"])
 			{
 				ns::Monster monster = monster_json.get<ns::Monster>();
+				std::cout << "  Monster Attack Type: " << monster.attack_type << std::endl;
 				std::cout << "  Monster Type: " << monster.type << std::endl;
 				std::cout << "  Location: (" << monster.location.x << ", " << monster.location.y << ", " << monster.location.z << ")" << std::endl;
 				if (monster.dest_location)

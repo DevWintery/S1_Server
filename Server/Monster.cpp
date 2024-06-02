@@ -56,7 +56,10 @@ void Monster::Update()
 			UpdateMove();
 		break;
 		case Protocol::MONSTER_STATE_ATTACK:
-			NavigationSystem::GetInstance()->SetAgentSpeed(GetAgentIndex(), 1.f);
+			if (_attackType != EMonsterAttackType::Punch)
+			{
+				NavigationSystem::GetInstance()->SetAgentSpeed(GetAgentIndex(), 1.f);
+			}
 			UpdateAttack();
 		break;
 	}
@@ -76,12 +79,13 @@ void Monster::TakeDamage(float damage)
 	}
 }
 
-void Monster::SetMoveMode(EMoveMode moveMode)
+void Monster::SetAttackType(EMonsterAttackType attackType)
 {
-	_moveMode = moveMode;
+	_attackType = attackType;
 }
 
-void Monster::SetMoveType(EMoveType moveType)
+
+void Monster::SetMoveType(EMonsterMoveType moveType)
 {
 	_moveType = moveType;
 }
@@ -108,6 +112,35 @@ void Monster::SetTarget(shared_ptr<Object> object)
 	{
 		_target = object;
 	}
+}
+
+bool Monster::CheckRange()
+{
+	float dist = FVector::Distance(GetAgentPos(), _target.lock()->GetPosVector());
+
+	float DISTANCE = _attackType == EMonsterAttackType::Rifle ? MonsterContant::ATTACK_DISTANCE : MonsterContant::PUNCH_ATTACK_DISTANCE;
+
+	if (GRoom->GetMapName() == "Yumin")
+	{
+		float multi = 10.0f;
+
+		if (_moveType == EMonsterMoveType::Rush)
+		{
+			multi = 1.0f;
+		}
+
+		if (_attackType == EMonsterAttackType::Rifle)
+		{
+			DISTANCE = MonsterContant::ATTACK_DISTANCE * 10.f;
+		}
+	}
+
+	if (DISTANCE > dist)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 FVector Monster::GetAgentPos()
@@ -141,7 +174,24 @@ bool Monster::PerformRaycast(const FVector& startPos, const FVector& endPos)
 bool Monster::IsTargetInSight(const FVector& targetPosition)
 {
 	float dist = FVector::Distance(GetAgentPos(), targetPosition);
-	if (dist > IN_ATTACK_DISTANCE)
+
+	float ATTACK_DISTANCE = _attackType == EMonsterAttackType::Rifle ? MonsterContant::IN_ATTACK_DISTANCE : MonsterContant::IN_PUNCH_ATTACK_DISTANCE;
+	if (GRoom->GetMapName() == "Yumin")
+	{
+		float multi = 10.0f;
+
+		if (_moveType == EMonsterMoveType::Rush)
+		{
+			multi = 1.0f;
+		}
+
+		if (_attackType == EMonsterAttackType::Rifle)
+		{
+			ATTACK_DISTANCE = MonsterContant::IN_ATTACK_DISTANCE * multi;
+		}
+	}
+
+	if (dist > ATTACK_DISTANCE)
 	{
 		return false;
 	}
@@ -157,6 +207,30 @@ bool Monster::IsTargetInSight(const FVector& targetPosition)
 	return true;
 }
 
+void Monster::RandomDestPos()
+{
+	_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, MonsterContant::SEARCH_RADIUS);
+
+	if (_destPos.IsZero())
+	{
+		cout << "Failed GetRandomDestination! Try search new destination" << endl;
+
+		int spinCount = 500;
+		for (int i = 0; i < spinCount; i++)
+		{
+			if (_destPos.IsZero() == false)
+				break;
+		}
+	}
+
+	//그래도 못찾았으면 일단 내 위치 사수하자
+	if (_destPos.IsZero())
+	{
+		cout << "Failed to search new destination." << endl;
+		_destPos = GetPosVector();
+	}
+}
+
 void Monster::SetState(Protocol::MonsterState state)
 {
 	if (_state == state)
@@ -166,7 +240,7 @@ void Monster::SetState(Protocol::MonsterState state)
 
 	if (_state == Protocol::MONSTER_STATE_ATTACK)
 	{
-		_moveMode = EMoveMode::Patrol;
+		_moveType = EMonsterMoveType::Patrol;
 	}
 
 	_state = state;
@@ -187,25 +261,14 @@ void Monster::SetState(Protocol::MonsterState state)
 
 	std::cout << "[MonsterState] TargetID :  " << targetID << ", State : " << state << std::endl;
 
-	shared_ptr<Room> myRoom = room.load().lock();
-	if (myRoom)
-	{
-		myRoom->DoAsync(&Room::HandleMonsterState, pkt);
-	}
+	GRoom->DoAsync(&Room::HandleMonsterState, pkt);
 }
 
 void Monster::UpdateIdle()
 {	
-	//얘는 그냥 쉬는애
-	if (_moveType == EMoveType::Fix)
-	{
-		return;
-	}
-
 	if (_target.lock())
 	{
-		float dist = FVector::Distance(GetAgentPos(), _target.lock()->GetPosVector());
-		if (ATTACK_DISTANCE > dist)
+		if (CheckRange())
 		{
 			SetState(Protocol::MONSTER_STATE_ATTACK);
 			return;
@@ -220,19 +283,37 @@ void Monster::UpdateIdle()
 		{
 			//움직이기
 			_wait = false;
-			_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, SEARCH_RADIUS);
+
+			RandomDestPos();
+
 			SetState(Protocol::MONSTER_STATE_MOVE);
+
+			/*_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, MonsterContant::SEARCH_RADIUS);
+			
+			if (_destPos.IsZero())
+			{
+				int spinCount = 500;
+				for (int i = 0; i < spinCount; i++)
+				{
+					if(_destPos.IsZero() == false)
+						break;
+				}
+			}*/
+
+			
 		}
 	}
-	else if(_moveType == EMoveType::Move)
+	else
 	{
-		if (_moveMode == EMoveMode::Rush)
+		if (_moveType == EMonsterMoveType::Rush)
 		{
 			NavigationSystem::GetInstance()->SetDestination(GetAgentIndex(), _destPos, 8.f);
 		}
 		else
 		{
-			_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, SEARCH_RADIUS);
+			RandomDestPos();
+
+			//_destPos = NavigationSystem::GetInstance()->SetRandomDestination(_agentIndex, MonsterContant::SEARCH_RADIUS);
 		}
 		SetState(Protocol::MONSTER_STATE_MOVE);
 	}
@@ -242,15 +323,15 @@ void Monster::UpdateMove()
 {
 	if (_target.lock())
 	{
-		float dist = FVector::Distance(GetAgentPos(), _target.lock()->GetPosVector());
-		if (ATTACK_DISTANCE > dist)
+		if (CheckRange())
 		{
 			SetState(Protocol::MONSTER_STATE_ATTACK);
 			return;
 		}
 	}
 
-	if (_moveMode == EMoveMode::Patrol)
+
+	if (_moveType == EMonsterMoveType::Patrol)
 	{
 		FVector recastPos = Utils::UE5ToRecast_Meter(_destPos);
 		float targetPos[3] = { recastPos.X, recastPos.Y, recastPos.Z };
@@ -258,7 +339,7 @@ void Monster::UpdateMove()
 		if (NavigationSystem::GetInstance()->IsAgentArrived(GetAgentIndex(), targetPos, 1.f))
 		{
 			_wait = true;
-			nextWaitTickAfter = GetTickCount64() + WAIT_TIME;
+			nextWaitTickAfter = GetTickCount64() + MonsterContant::WAIT_TIME;
 			NavigationSystem::GetInstance()->StopAgentMovement(GetAgentIndex());
 
 			SetState(Protocol::MONSTER_STATE_IDLE);
@@ -284,7 +365,7 @@ void Monster::UpdateAttack()
 	{
 		return;
 	}
-	nextAttackTickAfter = GetTickCount64() + ATTACK_TICK;
+	nextAttackTickAfter = GetTickCount64() + MonsterContant::ATTACK_TICK;
 
 	shared_ptr<Object> target = _target.lock();
 	if (target == nullptr)
@@ -312,11 +393,7 @@ void Monster::UpdateAttack()
 		attackPkt.set_end_y(target->GetPosVector().Y + Utils::GetRandom(-100.f, 100.f));
 		attackPkt.set_end_z(target->GetPosVector().Z + Utils::GetRandom(-50.f, 50.f));
 
-		shared_ptr<Room> myRoom = room.load().lock();
-		if (myRoom)
-		{
-			myRoom->DoAsync(&Room::HandleServerAttack, attackPkt, target);
-		}
+		GRoom->DoAsync(&Room::HandleServerAttack, attackPkt, target);
 	}
 }
 
@@ -329,9 +406,5 @@ void Monster::SendMovePacket()
 	GetPos()->set_z(agentPos.Z);
 	GetPos()->set_speed(GetAgentSpeed());
 
-	shared_ptr<Room> myRoom = room.load().lock();
-	if (myRoom)
-	{
-		myRoom->DoAsync(&Room::HandleServerMove, GetPos());
-	}
+	GRoom->DoAsync(&Room::HandleServerMove, GetPos());
 }

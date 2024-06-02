@@ -46,6 +46,9 @@ struct TableStruct_Struct_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Struct_2eproto;
 namespace Protocol {
+class ClothesInfo;
+struct ClothesInfoDefaultTypeInternal;
+extern ClothesInfoDefaultTypeInternal _ClothesInfo_default_instance_;
 class ObjectInfo;
 struct ObjectInfoDefaultTypeInternal;
 extern ObjectInfoDefaultTypeInternal _ObjectInfo_default_instance_;
@@ -60,6 +63,7 @@ struct Vector3DDefaultTypeInternal;
 extern Vector3DDefaultTypeInternal _Vector3D_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
+template<> ::Protocol::ClothesInfo* Arena::CreateMaybeMessage<::Protocol::ClothesInfo>(Arena*);
 template<> ::Protocol::ObjectInfo* Arena::CreateMaybeMessage<::Protocol::ObjectInfo>(Arena*);
 template<> ::Protocol::PosInfo* Arena::CreateMaybeMessage<::Protocol::PosInfo>(Arena*);
 template<> ::Protocol::RoomInfo* Arena::CreateMaybeMessage<::Protocol::RoomInfo>(Arena*);
@@ -585,10 +589,12 @@ class ObjectInfo final :
 
   enum : int {
     kPlayerNameFieldNumber = 2,
-    kPosInfoFieldNumber = 5,
+    kPosInfoFieldNumber = 6,
+    kClothesInfoFieldNumber = 7,
     kObjectIdFieldNumber = 1,
     kObjectTypeFieldNumber = 3,
     kCreatureTypeFieldNumber = 4,
+    kMonsterAttackTypeFieldNumber = 5,
   };
   // string player_name = 2;
   void clear_player_name();
@@ -604,7 +610,7 @@ class ObjectInfo final :
   std::string* _internal_mutable_player_name();
   public:
 
-  // .Protocol.PosInfo pos_info = 5;
+  // .Protocol.PosInfo pos_info = 6;
   bool has_pos_info() const;
   private:
   bool _internal_has_pos_info() const;
@@ -621,6 +627,24 @@ class ObjectInfo final :
   void unsafe_arena_set_allocated_pos_info(
       ::Protocol::PosInfo* pos_info);
   ::Protocol::PosInfo* unsafe_arena_release_pos_info();
+
+  // .Protocol.ClothesInfo clothes_info = 7;
+  bool has_clothes_info() const;
+  private:
+  bool _internal_has_clothes_info() const;
+  public:
+  void clear_clothes_info();
+  const ::Protocol::ClothesInfo& clothes_info() const;
+  PROTOBUF_NODISCARD ::Protocol::ClothesInfo* release_clothes_info();
+  ::Protocol::ClothesInfo* mutable_clothes_info();
+  void set_allocated_clothes_info(::Protocol::ClothesInfo* clothes_info);
+  private:
+  const ::Protocol::ClothesInfo& _internal_clothes_info() const;
+  ::Protocol::ClothesInfo* _internal_mutable_clothes_info();
+  public:
+  void unsafe_arena_set_allocated_clothes_info(
+      ::Protocol::ClothesInfo* clothes_info);
+  ::Protocol::ClothesInfo* unsafe_arena_release_clothes_info();
 
   // uint64 object_id = 1;
   void clear_object_id();
@@ -649,6 +673,15 @@ class ObjectInfo final :
   void _internal_set_creature_type(::Protocol::CreatureType value);
   public:
 
+  // .Protocol.MonsterAttackType monster_attack_type = 5;
+  void clear_monster_attack_type();
+  ::Protocol::MonsterAttackType monster_attack_type() const;
+  void set_monster_attack_type(::Protocol::MonsterAttackType value);
+  private:
+  ::Protocol::MonsterAttackType _internal_monster_attack_type() const;
+  void _internal_set_monster_attack_type(::Protocol::MonsterAttackType value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.ObjectInfo)
  private:
   class _Internal;
@@ -659,9 +692,269 @@ class ObjectInfo final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr player_name_;
     ::Protocol::PosInfo* pos_info_;
+    ::Protocol::ClothesInfo* clothes_info_;
     uint64_t object_id_;
     int object_type_;
     int creature_type_;
+    int monster_attack_type_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Struct_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ClothesInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.ClothesInfo) */ {
+ public:
+  inline ClothesInfo() : ClothesInfo(nullptr) {}
+  ~ClothesInfo() override;
+  explicit PROTOBUF_CONSTEXPR ClothesInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  ClothesInfo(const ClothesInfo& from);
+  ClothesInfo(ClothesInfo&& from) noexcept
+    : ClothesInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline ClothesInfo& operator=(const ClothesInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ClothesInfo& operator=(ClothesInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ClothesInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ClothesInfo* internal_default_instance() {
+    return reinterpret_cast<const ClothesInfo*>(
+               &_ClothesInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(ClothesInfo& a, ClothesInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(ClothesInfo* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ClothesInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  ClothesInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<ClothesInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const ClothesInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const ClothesInfo& from) {
+    ClothesInfo::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ClothesInfo* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.ClothesInfo";
+  }
+  protected:
+  explicit ClothesInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kHelmetIdFieldNumber = 1,
+    kAmorIdFieldNumber = 2,
+    kBeltsIdFieldNumber = 3,
+    kBootsIdFieldNumber = 4,
+    kGlassesIdFieldNumber = 5,
+    kGlovesIdFieldNumber = 6,
+    kJacketIdFieldNumber = 7,
+    kPantsIdFieldNumber = 8,
+    kMaskIdFieldNumber = 9,
+    kNvdIdFieldNumber = 10,
+    kRadioIdFieldNumber = 11,
+  };
+  // uint64 helmet_id = 1;
+  void clear_helmet_id();
+  uint64_t helmet_id() const;
+  void set_helmet_id(uint64_t value);
+  private:
+  uint64_t _internal_helmet_id() const;
+  void _internal_set_helmet_id(uint64_t value);
+  public:
+
+  // uint64 amor_id = 2;
+  void clear_amor_id();
+  uint64_t amor_id() const;
+  void set_amor_id(uint64_t value);
+  private:
+  uint64_t _internal_amor_id() const;
+  void _internal_set_amor_id(uint64_t value);
+  public:
+
+  // uint64 belts_id = 3;
+  void clear_belts_id();
+  uint64_t belts_id() const;
+  void set_belts_id(uint64_t value);
+  private:
+  uint64_t _internal_belts_id() const;
+  void _internal_set_belts_id(uint64_t value);
+  public:
+
+  // uint64 boots_id = 4;
+  void clear_boots_id();
+  uint64_t boots_id() const;
+  void set_boots_id(uint64_t value);
+  private:
+  uint64_t _internal_boots_id() const;
+  void _internal_set_boots_id(uint64_t value);
+  public:
+
+  // uint64 glasses_id = 5;
+  void clear_glasses_id();
+  uint64_t glasses_id() const;
+  void set_glasses_id(uint64_t value);
+  private:
+  uint64_t _internal_glasses_id() const;
+  void _internal_set_glasses_id(uint64_t value);
+  public:
+
+  // uint64 gloves_id = 6;
+  void clear_gloves_id();
+  uint64_t gloves_id() const;
+  void set_gloves_id(uint64_t value);
+  private:
+  uint64_t _internal_gloves_id() const;
+  void _internal_set_gloves_id(uint64_t value);
+  public:
+
+  // uint64 jacket_id = 7;
+  void clear_jacket_id();
+  uint64_t jacket_id() const;
+  void set_jacket_id(uint64_t value);
+  private:
+  uint64_t _internal_jacket_id() const;
+  void _internal_set_jacket_id(uint64_t value);
+  public:
+
+  // uint64 pants_id = 8;
+  void clear_pants_id();
+  uint64_t pants_id() const;
+  void set_pants_id(uint64_t value);
+  private:
+  uint64_t _internal_pants_id() const;
+  void _internal_set_pants_id(uint64_t value);
+  public:
+
+  // uint64 mask_id = 9;
+  void clear_mask_id();
+  uint64_t mask_id() const;
+  void set_mask_id(uint64_t value);
+  private:
+  uint64_t _internal_mask_id() const;
+  void _internal_set_mask_id(uint64_t value);
+  public:
+
+  // uint64 nvd_id = 10;
+  void clear_nvd_id();
+  uint64_t nvd_id() const;
+  void set_nvd_id(uint64_t value);
+  private:
+  uint64_t _internal_nvd_id() const;
+  void _internal_set_nvd_id(uint64_t value);
+  public:
+
+  // uint64 radio_id = 11;
+  void clear_radio_id();
+  uint64_t radio_id() const;
+  void set_radio_id(uint64_t value);
+  private:
+  uint64_t _internal_radio_id() const;
+  void _internal_set_radio_id(uint64_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.ClothesInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    uint64_t helmet_id_;
+    uint64_t amor_id_;
+    uint64_t belts_id_;
+    uint64_t boots_id_;
+    uint64_t glasses_id_;
+    uint64_t gloves_id_;
+    uint64_t jacket_id_;
+    uint64_t pants_id_;
+    uint64_t mask_id_;
+    uint64_t nvd_id_;
+    uint64_t radio_id_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -717,7 +1010,7 @@ class Vector3D final :
                &_Vector3D_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(Vector3D& a, Vector3D& b) {
     a.Swap(&b);
@@ -1226,7 +1519,27 @@ inline void ObjectInfo::set_creature_type(::Protocol::CreatureType value) {
   // @@protoc_insertion_point(field_set:Protocol.ObjectInfo.creature_type)
 }
 
-// .Protocol.PosInfo pos_info = 5;
+// .Protocol.MonsterAttackType monster_attack_type = 5;
+inline void ObjectInfo::clear_monster_attack_type() {
+  _impl_.monster_attack_type_ = 0;
+}
+inline ::Protocol::MonsterAttackType ObjectInfo::_internal_monster_attack_type() const {
+  return static_cast< ::Protocol::MonsterAttackType >(_impl_.monster_attack_type_);
+}
+inline ::Protocol::MonsterAttackType ObjectInfo::monster_attack_type() const {
+  // @@protoc_insertion_point(field_get:Protocol.ObjectInfo.monster_attack_type)
+  return _internal_monster_attack_type();
+}
+inline void ObjectInfo::_internal_set_monster_attack_type(::Protocol::MonsterAttackType value) {
+  
+  _impl_.monster_attack_type_ = value;
+}
+inline void ObjectInfo::set_monster_attack_type(::Protocol::MonsterAttackType value) {
+  _internal_set_monster_attack_type(value);
+  // @@protoc_insertion_point(field_set:Protocol.ObjectInfo.monster_attack_type)
+}
+
+// .Protocol.PosInfo pos_info = 6;
 inline bool ObjectInfo::_internal_has_pos_info() const {
   return this != internal_default_instance() && _impl_.pos_info_ != nullptr;
 }
@@ -1316,6 +1629,320 @@ inline void ObjectInfo::set_allocated_pos_info(::Protocol::PosInfo* pos_info) {
   // @@protoc_insertion_point(field_set_allocated:Protocol.ObjectInfo.pos_info)
 }
 
+// .Protocol.ClothesInfo clothes_info = 7;
+inline bool ObjectInfo::_internal_has_clothes_info() const {
+  return this != internal_default_instance() && _impl_.clothes_info_ != nullptr;
+}
+inline bool ObjectInfo::has_clothes_info() const {
+  return _internal_has_clothes_info();
+}
+inline void ObjectInfo::clear_clothes_info() {
+  if (GetArenaForAllocation() == nullptr && _impl_.clothes_info_ != nullptr) {
+    delete _impl_.clothes_info_;
+  }
+  _impl_.clothes_info_ = nullptr;
+}
+inline const ::Protocol::ClothesInfo& ObjectInfo::_internal_clothes_info() const {
+  const ::Protocol::ClothesInfo* p = _impl_.clothes_info_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Protocol::ClothesInfo&>(
+      ::Protocol::_ClothesInfo_default_instance_);
+}
+inline const ::Protocol::ClothesInfo& ObjectInfo::clothes_info() const {
+  // @@protoc_insertion_point(field_get:Protocol.ObjectInfo.clothes_info)
+  return _internal_clothes_info();
+}
+inline void ObjectInfo::unsafe_arena_set_allocated_clothes_info(
+    ::Protocol::ClothesInfo* clothes_info) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.clothes_info_);
+  }
+  _impl_.clothes_info_ = clothes_info;
+  if (clothes_info) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Protocol.ObjectInfo.clothes_info)
+}
+inline ::Protocol::ClothesInfo* ObjectInfo::release_clothes_info() {
+  
+  ::Protocol::ClothesInfo* temp = _impl_.clothes_info_;
+  _impl_.clothes_info_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Protocol::ClothesInfo* ObjectInfo::unsafe_arena_release_clothes_info() {
+  // @@protoc_insertion_point(field_release:Protocol.ObjectInfo.clothes_info)
+  
+  ::Protocol::ClothesInfo* temp = _impl_.clothes_info_;
+  _impl_.clothes_info_ = nullptr;
+  return temp;
+}
+inline ::Protocol::ClothesInfo* ObjectInfo::_internal_mutable_clothes_info() {
+  
+  if (_impl_.clothes_info_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Protocol::ClothesInfo>(GetArenaForAllocation());
+    _impl_.clothes_info_ = p;
+  }
+  return _impl_.clothes_info_;
+}
+inline ::Protocol::ClothesInfo* ObjectInfo::mutable_clothes_info() {
+  ::Protocol::ClothesInfo* _msg = _internal_mutable_clothes_info();
+  // @@protoc_insertion_point(field_mutable:Protocol.ObjectInfo.clothes_info)
+  return _msg;
+}
+inline void ObjectInfo::set_allocated_clothes_info(::Protocol::ClothesInfo* clothes_info) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.clothes_info_;
+  }
+  if (clothes_info) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(clothes_info);
+    if (message_arena != submessage_arena) {
+      clothes_info = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, clothes_info, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.clothes_info_ = clothes_info;
+  // @@protoc_insertion_point(field_set_allocated:Protocol.ObjectInfo.clothes_info)
+}
+
+// -------------------------------------------------------------------
+
+// ClothesInfo
+
+// uint64 helmet_id = 1;
+inline void ClothesInfo::clear_helmet_id() {
+  _impl_.helmet_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_helmet_id() const {
+  return _impl_.helmet_id_;
+}
+inline uint64_t ClothesInfo::helmet_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.helmet_id)
+  return _internal_helmet_id();
+}
+inline void ClothesInfo::_internal_set_helmet_id(uint64_t value) {
+  
+  _impl_.helmet_id_ = value;
+}
+inline void ClothesInfo::set_helmet_id(uint64_t value) {
+  _internal_set_helmet_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.helmet_id)
+}
+
+// uint64 amor_id = 2;
+inline void ClothesInfo::clear_amor_id() {
+  _impl_.amor_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_amor_id() const {
+  return _impl_.amor_id_;
+}
+inline uint64_t ClothesInfo::amor_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.amor_id)
+  return _internal_amor_id();
+}
+inline void ClothesInfo::_internal_set_amor_id(uint64_t value) {
+  
+  _impl_.amor_id_ = value;
+}
+inline void ClothesInfo::set_amor_id(uint64_t value) {
+  _internal_set_amor_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.amor_id)
+}
+
+// uint64 belts_id = 3;
+inline void ClothesInfo::clear_belts_id() {
+  _impl_.belts_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_belts_id() const {
+  return _impl_.belts_id_;
+}
+inline uint64_t ClothesInfo::belts_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.belts_id)
+  return _internal_belts_id();
+}
+inline void ClothesInfo::_internal_set_belts_id(uint64_t value) {
+  
+  _impl_.belts_id_ = value;
+}
+inline void ClothesInfo::set_belts_id(uint64_t value) {
+  _internal_set_belts_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.belts_id)
+}
+
+// uint64 boots_id = 4;
+inline void ClothesInfo::clear_boots_id() {
+  _impl_.boots_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_boots_id() const {
+  return _impl_.boots_id_;
+}
+inline uint64_t ClothesInfo::boots_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.boots_id)
+  return _internal_boots_id();
+}
+inline void ClothesInfo::_internal_set_boots_id(uint64_t value) {
+  
+  _impl_.boots_id_ = value;
+}
+inline void ClothesInfo::set_boots_id(uint64_t value) {
+  _internal_set_boots_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.boots_id)
+}
+
+// uint64 glasses_id = 5;
+inline void ClothesInfo::clear_glasses_id() {
+  _impl_.glasses_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_glasses_id() const {
+  return _impl_.glasses_id_;
+}
+inline uint64_t ClothesInfo::glasses_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.glasses_id)
+  return _internal_glasses_id();
+}
+inline void ClothesInfo::_internal_set_glasses_id(uint64_t value) {
+  
+  _impl_.glasses_id_ = value;
+}
+inline void ClothesInfo::set_glasses_id(uint64_t value) {
+  _internal_set_glasses_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.glasses_id)
+}
+
+// uint64 gloves_id = 6;
+inline void ClothesInfo::clear_gloves_id() {
+  _impl_.gloves_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_gloves_id() const {
+  return _impl_.gloves_id_;
+}
+inline uint64_t ClothesInfo::gloves_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.gloves_id)
+  return _internal_gloves_id();
+}
+inline void ClothesInfo::_internal_set_gloves_id(uint64_t value) {
+  
+  _impl_.gloves_id_ = value;
+}
+inline void ClothesInfo::set_gloves_id(uint64_t value) {
+  _internal_set_gloves_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.gloves_id)
+}
+
+// uint64 jacket_id = 7;
+inline void ClothesInfo::clear_jacket_id() {
+  _impl_.jacket_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_jacket_id() const {
+  return _impl_.jacket_id_;
+}
+inline uint64_t ClothesInfo::jacket_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.jacket_id)
+  return _internal_jacket_id();
+}
+inline void ClothesInfo::_internal_set_jacket_id(uint64_t value) {
+  
+  _impl_.jacket_id_ = value;
+}
+inline void ClothesInfo::set_jacket_id(uint64_t value) {
+  _internal_set_jacket_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.jacket_id)
+}
+
+// uint64 pants_id = 8;
+inline void ClothesInfo::clear_pants_id() {
+  _impl_.pants_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_pants_id() const {
+  return _impl_.pants_id_;
+}
+inline uint64_t ClothesInfo::pants_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.pants_id)
+  return _internal_pants_id();
+}
+inline void ClothesInfo::_internal_set_pants_id(uint64_t value) {
+  
+  _impl_.pants_id_ = value;
+}
+inline void ClothesInfo::set_pants_id(uint64_t value) {
+  _internal_set_pants_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.pants_id)
+}
+
+// uint64 mask_id = 9;
+inline void ClothesInfo::clear_mask_id() {
+  _impl_.mask_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_mask_id() const {
+  return _impl_.mask_id_;
+}
+inline uint64_t ClothesInfo::mask_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.mask_id)
+  return _internal_mask_id();
+}
+inline void ClothesInfo::_internal_set_mask_id(uint64_t value) {
+  
+  _impl_.mask_id_ = value;
+}
+inline void ClothesInfo::set_mask_id(uint64_t value) {
+  _internal_set_mask_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.mask_id)
+}
+
+// uint64 nvd_id = 10;
+inline void ClothesInfo::clear_nvd_id() {
+  _impl_.nvd_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_nvd_id() const {
+  return _impl_.nvd_id_;
+}
+inline uint64_t ClothesInfo::nvd_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.nvd_id)
+  return _internal_nvd_id();
+}
+inline void ClothesInfo::_internal_set_nvd_id(uint64_t value) {
+  
+  _impl_.nvd_id_ = value;
+}
+inline void ClothesInfo::set_nvd_id(uint64_t value) {
+  _internal_set_nvd_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.nvd_id)
+}
+
+// uint64 radio_id = 11;
+inline void ClothesInfo::clear_radio_id() {
+  _impl_.radio_id_ = uint64_t{0u};
+}
+inline uint64_t ClothesInfo::_internal_radio_id() const {
+  return _impl_.radio_id_;
+}
+inline uint64_t ClothesInfo::radio_id() const {
+  // @@protoc_insertion_point(field_get:Protocol.ClothesInfo.radio_id)
+  return _internal_radio_id();
+}
+inline void ClothesInfo::_internal_set_radio_id(uint64_t value) {
+  
+  _impl_.radio_id_ = value;
+}
+inline void ClothesInfo::set_radio_id(uint64_t value) {
+  _internal_set_radio_id(value);
+  // @@protoc_insertion_point(field_set:Protocol.ClothesInfo.radio_id)
+}
+
 // -------------------------------------------------------------------
 
 // Vector3D
@@ -1383,6 +2010,8 @@ inline void Vector3D::set_z(float value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -3,6 +3,19 @@
 #include "Creature.h"
 #include "Define.h"
 
+namespace MonsterContant
+{
+	const uint64 ATTACK_TICK = 1500;
+	const uint64 WAIT_TIME = 5000;
+
+	const float ATTACK_DISTANCE = 2500.f;
+	const float IN_ATTACK_DISTANCE = 4000.f;
+	const float SEARCH_RADIUS = 3.f;
+
+	const float PUNCH_ATTACK_DISTANCE = 1500.f;
+	const float IN_PUNCH_ATTACK_DISTANCE = 250.f;
+}
+
 class Monster : public Creature
 {
 public:
@@ -25,11 +38,14 @@ public:
 	virtual void SetState(Protocol::MonsterState state);
 	virtual Protocol::MonsterState GetState() { return _state; }
 
-	void SetMoveMode(EMoveMode moveMode);
-	void SetMoveType(EMoveType moveType);
+
+	void SetAttackType(EMonsterAttackType attackType);
+	void SetMoveType(EMonsterMoveType moveType);
 	void SetDestPos(const FVector& destPos) { _destPos = destPos; }
 	virtual void SetPos(const FVector& pos) override;
 	void SetTarget(shared_ptr<Object> object);
+
+	bool CheckRange();
 
 /*Detour Agent*/
 public:
@@ -42,13 +58,9 @@ public:
 	bool PerformRaycast(const FVector& startPos, const FVector& endPos);
 	bool IsTargetInSight(const FVector& targetPosition);
 
-private:
-	const uint64 ATTACK_TICK = 1500;
-	const uint64 WAIT_TIME = 5000;
-	const float ATTACK_DISTANCE = 2500.f;
-	const float IN_ATTACK_DISTANCE = 4000.f;
-	const float SEARCH_RADIUS = 3.f;
+	void RandomDestPos();
 
+private:
 	uint64 nextAttackTickAfter = 0;
 	uint64 nextWaitTickAfter = 0;
 
@@ -57,12 +69,10 @@ private:
 	bool _wait = false;
 
 private:
-	EMoveMode _moveMode = EMoveMode::Patrol;
-	EMoveType _moveType = EMoveType::Move;
+	EMonsterAttackType _attackType = EMonsterAttackType::Rifle;
+	EMonsterMoveType _moveType = EMonsterMoveType::Patrol;
 	Protocol::MonsterState _state = Protocol::MONSTER_STATE_IDLE;
 	weak_ptr<Object> _target;
-
-
 
 	int _agentIndex = -1;
 };

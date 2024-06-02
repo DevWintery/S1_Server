@@ -24,6 +24,7 @@ namespace Protocol {
 PROTOBUF_CONSTEXPR C_ENTER_ROOM::C_ENTER_ROOM(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.player_name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.clothes_info_)*/nullptr
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct C_ENTER_ROOMDefaultTypeInternal {
   PROTOBUF_CONSTEXPR C_ENTER_ROOMDefaultTypeInternal()
@@ -353,6 +354,7 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::C_ENTER_ROOM, _impl_.player_name_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_ENTER_ROOM, _impl_.clothes_info_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::S_ENTER_ROOM, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -532,28 +534,28 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::C_ENTER_ROOM)},
-  { 7, -1, -1, sizeof(::Protocol::S_ENTER_ROOM)},
-  { 15, -1, -1, sizeof(::Protocol::C_ENTER_GAME)},
-  { 23, -1, -1, sizeof(::Protocol::S_ENTER_GAME)},
-  { 30, -1, -1, sizeof(::Protocol::C_GAME_INIT)},
-  { 36, -1, -1, sizeof(::Protocol::S_GAME_INIT)},
-  { 43, -1, -1, sizeof(::Protocol::C_LEAVE_GAME)},
-  { 49, -1, -1, sizeof(::Protocol::S_LEAVE_GAME)},
-  { 55, -1, -1, sizeof(::Protocol::S_SPAWN)},
-  { 62, -1, -1, sizeof(::Protocol::S_DESPAWN)},
-  { 69, -1, -1, sizeof(::Protocol::C_MOVE)},
-  { 76, -1, -1, sizeof(::Protocol::S_MOVE)},
-  { 83, -1, -1, sizeof(::Protocol::S_MONSTER_STATE)},
-  { 92, -1, -1, sizeof(::Protocol::C_ANIMATION_STATE)},
-  { 100, -1, -1, sizeof(::Protocol::S_ANIMATION_STATE)},
-  { 108, -1, -1, sizeof(::Protocol::C_ATTACK)},
-  { 121, -1, -1, sizeof(::Protocol::S_ATTACK)},
-  { 134, -1, -1, sizeof(::Protocol::C_HIT)},
-  { 142, -1, -1, sizeof(::Protocol::S_HIT)},
-  { 150, -1, -1, sizeof(::Protocol::C_INTERACT)},
-  { 158, -1, -1, sizeof(::Protocol::S_INTERACT)},
-  { 167, -1, -1, sizeof(::Protocol::C_CHANGE_WEAPON)},
-  { 175, -1, -1, sizeof(::Protocol::S_CHANGE_WEAPON)},
+  { 8, -1, -1, sizeof(::Protocol::S_ENTER_ROOM)},
+  { 16, -1, -1, sizeof(::Protocol::C_ENTER_GAME)},
+  { 24, -1, -1, sizeof(::Protocol::S_ENTER_GAME)},
+  { 31, -1, -1, sizeof(::Protocol::C_GAME_INIT)},
+  { 37, -1, -1, sizeof(::Protocol::S_GAME_INIT)},
+  { 44, -1, -1, sizeof(::Protocol::C_LEAVE_GAME)},
+  { 50, -1, -1, sizeof(::Protocol::S_LEAVE_GAME)},
+  { 56, -1, -1, sizeof(::Protocol::S_SPAWN)},
+  { 63, -1, -1, sizeof(::Protocol::S_DESPAWN)},
+  { 70, -1, -1, sizeof(::Protocol::C_MOVE)},
+  { 77, -1, -1, sizeof(::Protocol::S_MOVE)},
+  { 84, -1, -1, sizeof(::Protocol::S_MONSTER_STATE)},
+  { 93, -1, -1, sizeof(::Protocol::C_ANIMATION_STATE)},
+  { 101, -1, -1, sizeof(::Protocol::S_ANIMATION_STATE)},
+  { 109, -1, -1, sizeof(::Protocol::C_ATTACK)},
+  { 122, -1, -1, sizeof(::Protocol::S_ATTACK)},
+  { 135, -1, -1, sizeof(::Protocol::C_HIT)},
+  { 143, -1, -1, sizeof(::Protocol::S_HIT)},
+  { 151, -1, -1, sizeof(::Protocol::C_INTERACT)},
+  { 159, -1, -1, sizeof(::Protocol::S_INTERACT)},
+  { 168, -1, -1, sizeof(::Protocol::C_CHANGE_WEAPON)},
+  { 176, -1, -1, sizeof(::Protocol::S_CHANGE_WEAPON)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -584,42 +586,43 @@ static const ::_pb::Message* const file_default_instances[] = {
 
 const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\016Protocol.proto\022\010Protocol\032\nEnum.proto\032\014"
-  "Struct.proto\"#\n\014C_ENTER_ROOM\022\023\n\013player_n"
-  "ame\030\001 \001(\t\"F\n\014S_ENTER_ROOM\022\017\n\007room_id\030\001 \001"
-  "(\003\022%\n\007players\030\002 \003(\0132\024.Protocol.ObjectInf"
-  "o\"1\n\014C_ENTER_GAME\022\017\n\007room_id\030\001 \001(\003\022\020\n\010ma"
-  "p_name\030\002 \001(\t\" \n\014S_ENTER_GAME\022\020\n\010map_name"
-  "\030\001 \001(\t\"\r\n\013C_GAME_INIT\"3\n\013S_GAME_INIT\022$\n\006"
-  "player\030\001 \001(\0132\024.Protocol.ObjectInfo\"\016\n\014C_"
-  "LEAVE_GAME\"\016\n\014S_LEAVE_GAME\"0\n\007S_SPAWN\022%\n"
-  "\007objects\030\001 \003(\0132\024.Protocol.ObjectInfo\"\037\n\t"
-  "S_DESPAWN\022\022\n\nobject_ids\030\001 \003(\004\")\n\006C_MOVE\022"
-  "\037\n\004info\030\001 \001(\0132\021.Protocol.PosInfo\")\n\006S_MO"
-  "VE\022\037\n\004info\030\001 \001(\0132\021.Protocol.PosInfo\"e\n\017S"
-  "_MONSTER_STATE\022\021\n\tobject_id\030\001 \001(\004\022%\n\005sta"
-  "te\030\002 \001(\0162\026.Protocol.MonsterState\022\030\n\020targ"
-  "et_object_id\030\003 \001(\003\"Y\n\021C_ANIMATION_STATE\022"
-  "\021\n\tobject_id\030\001 \001(\004\0221\n\017animation_state\030\002 "
-  "\001(\0162\030.Protocol.AnimationState\"Y\n\021S_ANIMA"
-  "TION_STATE\022\021\n\tobject_id\030\001 \001(\004\0221\n\017animati"
-  "on_state\030\002 \001(\0162\030.Protocol.AnimationState"
-  "\"}\n\010C_ATTACK\022\021\n\tobject_id\030\001 \001(\004\022\017\n\007start"
-  "_x\030\002 \001(\002\022\017\n\007start_y\030\003 \001(\002\022\017\n\007start_z\030\004 \001"
-  "(\002\022\r\n\005end_x\030\005 \001(\002\022\r\n\005end_y\030\006 \001(\002\022\r\n\005end_"
-  "z\030\007 \001(\002\"}\n\010S_ATTACK\022\021\n\tobject_id\030\001 \001(\004\022\017"
-  "\n\007start_x\030\002 \001(\002\022\017\n\007start_y\030\003 \001(\002\022\017\n\007star"
-  "t_z\030\004 \001(\002\022\r\n\005end_x\030\005 \001(\002\022\r\n\005end_y\030\006 \001(\002\022"
-  "\r\n\005end_z\030\007 \001(\002\"*\n\005C_HIT\022\021\n\tobject_id\030\001 \001"
-  "(\004\022\016\n\006damage\030\002 \001(\002\"*\n\005S_HIT\022\021\n\tobject_id"
-  "\030\001 \001(\004\022\016\n\006damage\030\002 \001(\002\"N\n\nC_INTERACT\022\021\n\t"
-  "object_id\030\001 \001(\004\022-\n\rinteract_type\030\002 \001(\0162\026"
-  ".Protocol.InteractType\"_\n\nS_INTERACT\022\021\n\t"
-  "object_id\030\001 \001(\004\022-\n\rinteract_type\030\002 \001(\0162\026"
-  ".Protocol.InteractType\022\017\n\007step_id\030\003 \001(\004\""
-  "7\n\017C_CHANGE_WEAPON\022\021\n\tobject_id\030\001 \001(\004\022\021\n"
-  "\tweapon_id\030\002 \001(\004\"7\n\017S_CHANGE_WEAPON\022\021\n\to"
-  "bject_id\030\001 \001(\004\022\021\n\tweapon_id\030\002 \001(\004b\006proto"
-  "3"
+  "Struct.proto\"P\n\014C_ENTER_ROOM\022\023\n\013player_n"
+  "ame\030\001 \001(\t\022+\n\014clothes_info\030\002 \001(\0132\025.Protoc"
+  "ol.ClothesInfo\"F\n\014S_ENTER_ROOM\022\017\n\007room_i"
+  "d\030\001 \001(\003\022%\n\007players\030\002 \003(\0132\024.Protocol.Obje"
+  "ctInfo\"1\n\014C_ENTER_GAME\022\017\n\007room_id\030\001 \001(\003\022"
+  "\020\n\010map_name\030\002 \001(\t\" \n\014S_ENTER_GAME\022\020\n\010map"
+  "_name\030\001 \001(\t\"\r\n\013C_GAME_INIT\"3\n\013S_GAME_INI"
+  "T\022$\n\006player\030\001 \001(\0132\024.Protocol.ObjectInfo\""
+  "\016\n\014C_LEAVE_GAME\"\016\n\014S_LEAVE_GAME\"0\n\007S_SPA"
+  "WN\022%\n\007objects\030\001 \003(\0132\024.Protocol.ObjectInf"
+  "o\"\037\n\tS_DESPAWN\022\022\n\nobject_ids\030\001 \003(\004\")\n\006C_"
+  "MOVE\022\037\n\004info\030\001 \001(\0132\021.Protocol.PosInfo\")\n"
+  "\006S_MOVE\022\037\n\004info\030\001 \001(\0132\021.Protocol.PosInfo"
+  "\"e\n\017S_MONSTER_STATE\022\021\n\tobject_id\030\001 \001(\004\022%"
+  "\n\005state\030\002 \001(\0162\026.Protocol.MonsterState\022\030\n"
+  "\020target_object_id\030\003 \001(\003\"Y\n\021C_ANIMATION_S"
+  "TATE\022\021\n\tobject_id\030\001 \001(\004\0221\n\017animation_sta"
+  "te\030\002 \001(\0162\030.Protocol.AnimationState\"Y\n\021S_"
+  "ANIMATION_STATE\022\021\n\tobject_id\030\001 \001(\004\0221\n\017an"
+  "imation_state\030\002 \001(\0162\030.Protocol.Animation"
+  "State\"}\n\010C_ATTACK\022\021\n\tobject_id\030\001 \001(\004\022\017\n\007"
+  "start_x\030\002 \001(\002\022\017\n\007start_y\030\003 \001(\002\022\017\n\007start_"
+  "z\030\004 \001(\002\022\r\n\005end_x\030\005 \001(\002\022\r\n\005end_y\030\006 \001(\002\022\r\n"
+  "\005end_z\030\007 \001(\002\"}\n\010S_ATTACK\022\021\n\tobject_id\030\001 "
+  "\001(\004\022\017\n\007start_x\030\002 \001(\002\022\017\n\007start_y\030\003 \001(\002\022\017\n"
+  "\007start_z\030\004 \001(\002\022\r\n\005end_x\030\005 \001(\002\022\r\n\005end_y\030\006"
+  " \001(\002\022\r\n\005end_z\030\007 \001(\002\"*\n\005C_HIT\022\021\n\tobject_i"
+  "d\030\001 \001(\004\022\016\n\006damage\030\002 \001(\002\"*\n\005S_HIT\022\021\n\tobje"
+  "ct_id\030\001 \001(\004\022\016\n\006damage\030\002 \001(\002\"N\n\nC_INTERAC"
+  "T\022\021\n\tobject_id\030\001 \001(\004\022-\n\rinteract_type\030\002 "
+  "\001(\0162\026.Protocol.InteractType\"_\n\nS_INTERAC"
+  "T\022\021\n\tobject_id\030\001 \001(\004\022-\n\rinteract_type\030\002 "
+  "\001(\0162\026.Protocol.InteractType\022\017\n\007step_id\030\003"
+  " \001(\004\"7\n\017C_CHANGE_WEAPON\022\021\n\tobject_id\030\001 \001"
+  "(\004\022\021\n\tweapon_id\030\002 \001(\004\"7\n\017S_CHANGE_WEAPON"
+  "\022\021\n\tobject_id\030\001 \001(\004\022\021\n\tweapon_id\030\002 \001(\004b\006"
+  "proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -627,7 +630,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_de
 };
 static ::_pbi::once_flag descriptor_table_Protocol_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Protocol_2eproto = {
-    false, false, 1441, descriptor_table_protodef_Protocol_2eproto,
+    false, false, 1486, descriptor_table_protodef_Protocol_2eproto,
     "Protocol.proto",
     &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 23,
     schemas, file_default_instances, TableStruct_Protocol_2eproto::offsets,
@@ -646,8 +649,19 @@ namespace Protocol {
 
 class C_ENTER_ROOM::_Internal {
  public:
+  static const ::Protocol::ClothesInfo& clothes_info(const C_ENTER_ROOM* msg);
 };
 
+const ::Protocol::ClothesInfo&
+C_ENTER_ROOM::_Internal::clothes_info(const C_ENTER_ROOM* msg) {
+  return *msg->_impl_.clothes_info_;
+}
+void C_ENTER_ROOM::clear_clothes_info() {
+  if (GetArenaForAllocation() == nullptr && _impl_.clothes_info_ != nullptr) {
+    delete _impl_.clothes_info_;
+  }
+  _impl_.clothes_info_ = nullptr;
+}
 C_ENTER_ROOM::C_ENTER_ROOM(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -659,6 +673,7 @@ C_ENTER_ROOM::C_ENTER_ROOM(const C_ENTER_ROOM& from)
   C_ENTER_ROOM* const _this = this; (void)_this;
   new (&_impl_) Impl_{
       decltype(_impl_.player_name_){}
+    , decltype(_impl_.clothes_info_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -670,6 +685,9 @@ C_ENTER_ROOM::C_ENTER_ROOM(const C_ENTER_ROOM& from)
     _this->_impl_.player_name_.Set(from._internal_player_name(), 
       _this->GetArenaForAllocation());
   }
+  if (from._internal_has_clothes_info()) {
+    _this->_impl_.clothes_info_ = new ::Protocol::ClothesInfo(*from._impl_.clothes_info_);
+  }
   // @@protoc_insertion_point(copy_constructor:Protocol.C_ENTER_ROOM)
 }
 
@@ -679,6 +697,7 @@ inline void C_ENTER_ROOM::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.player_name_){}
+    , decltype(_impl_.clothes_info_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.player_name_.InitDefault();
@@ -699,6 +718,7 @@ C_ENTER_ROOM::~C_ENTER_ROOM() {
 inline void C_ENTER_ROOM::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   _impl_.player_name_.Destroy();
+  if (this != internal_default_instance()) delete _impl_.clothes_info_;
 }
 
 void C_ENTER_ROOM::SetCachedSize(int size) const {
@@ -712,6 +732,10 @@ void C_ENTER_ROOM::Clear() {
   (void) cached_has_bits;
 
   _impl_.player_name_.ClearToEmpty();
+  if (GetArenaForAllocation() == nullptr && _impl_.clothes_info_ != nullptr) {
+    delete _impl_.clothes_info_;
+  }
+  _impl_.clothes_info_ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -728,6 +752,14 @@ const char* C_ENTER_ROOM::_InternalParse(const char* ptr, ::_pbi::ParseContext* 
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
           CHK_(::_pbi::VerifyUTF8(str, "Protocol.C_ENTER_ROOM.player_name"));
+        } else
+          goto handle_unusual;
+        continue;
+      // .Protocol.ClothesInfo clothes_info = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          ptr = ctx->ParseMessage(_internal_mutable_clothes_info(), ptr);
+          CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
@@ -770,6 +802,13 @@ uint8_t* C_ENTER_ROOM::_InternalSerialize(
         1, this->_internal_player_name(), target);
   }
 
+  // .Protocol.ClothesInfo clothes_info = 2;
+  if (this->_internal_has_clothes_info()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(2, _Internal::clothes_info(this),
+        _Internal::clothes_info(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -793,6 +832,13 @@ size_t C_ENTER_ROOM::ByteSizeLong() const {
         this->_internal_player_name());
   }
 
+  // .Protocol.ClothesInfo clothes_info = 2;
+  if (this->_internal_has_clothes_info()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.clothes_info_);
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -813,6 +859,10 @@ void C_ENTER_ROOM::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::P
 
   if (!from._internal_player_name().empty()) {
     _this->_internal_set_player_name(from._internal_player_name());
+  }
+  if (from._internal_has_clothes_info()) {
+    _this->_internal_mutable_clothes_info()->::Protocol::ClothesInfo::MergeFrom(
+        from._internal_clothes_info());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -837,6 +887,7 @@ void C_ENTER_ROOM::InternalSwap(C_ENTER_ROOM* other) {
       &_impl_.player_name_, lhs_arena,
       &other->_impl_.player_name_, rhs_arena
   );
+  swap(_impl_.clothes_info_, other->_impl_.clothes_info_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata C_ENTER_ROOM::GetMetadata() const {

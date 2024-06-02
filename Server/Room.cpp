@@ -45,14 +45,14 @@ bool Room::EnterRoom(shared_ptr<Player> player)
 		if(obj.second->GetInfo()->creature_type() == Protocol::CREATURE_TYPE_PLAYER)
 		{
 			Protocol::ObjectInfo* info = pkt.add_players();
-			info->set_player_name(obj.second->GetInfo()->player_name());
-
+			info->CopyFrom(*obj.second->GetInfo());
+			//info->set_player_name(obj.second->GetInfo()->player_name());
+			
 			std::cout << obj.second->GetInfo()->player_name() << std::endl;
 		}
 	}
 
 	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
-	
 	Broadcast(sendBuffer);
 
 	return true;
@@ -64,6 +64,7 @@ bool Room::EnterGame(Protocol::C_ENTER_GAME pkt)
 	_mapName = pkt.map_name();
 
 	Protocol::S_ENTER_GAME enterGamePkt;
+	enterGamePkt.set_map_name(_mapName);
 	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(enterGamePkt);
 
 	Broadcast(sendBuffer);
@@ -85,8 +86,8 @@ bool Room::GameInit(Protocol::C_GAME_INIT pkt)
 		shared_ptr<Object> object = obj.second;
 
 		//시작 위치 세팅
-		object->GetPos()->set_x(StartPos.X + Utils::GetRandom(-250.f, 250.f));
-		object->GetPos()->set_y(StartPos.Y + Utils::GetRandom(-250.f, 250.f));
+		object->GetPos()->set_x(StartPos.X + Utils::GetRandom(-150.f, 150.f));
+		object->GetPos()->set_y(StartPos.Y + Utils::GetRandom(-150.f, 150.f));
 		object->GetPos()->set_z(StartPos.Z);
 		object->GetPos()->set_yaw(Utils::GetRandom(0.f, 100.f));
 
@@ -114,12 +115,7 @@ bool Room::GameInit(Protocol::C_GAME_INIT pkt)
 		}
 	}
 
-#if _DEBUG
-	std::vector<ns::Monster> monsters = JsonUtil::ParseJson("F:\\S1\\Server\\Hangar.json", 0);
-#else
 	std::vector<ns::Monster> monsterInfos = JsonUtil::ParseJson(_mapName + "_Monster.json", senarioStep);
-#endif
-
 	SpawnMonster(monsterInfos);
 
 	_initialize = true;
@@ -135,16 +131,25 @@ bool Room::HandleLeavePlayer(shared_ptr<Player> player)
 		return false;
 	}
 
-	cout << "LEAVE PLAYER" << endl;
+	Protocol::S_LEAVE_GAME pkt;
+	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(pkt);
+	
+	if (shared_ptr<GameSession> session = player->GetSession().lock())
+	{
+		cout << "LEAVE PLAYER" << endl;
+		session->Send(sendBuffer);
+	}
 
-	_objects.erase(objectId);
-	_playerCount--;
+	_playerCount --;
 
 	//플레이어가 모두 떠나면 종료
 	if(0 >= _playerCount)
 	{
-		cout << "Exit" << endl;
-		quick_exit(0);
+		GRoom->DoTimer(3000, []()
+			{
+				cout << "Exit" << endl;
+				quick_exit(0);
+			});
 	}
 
 	return true;
@@ -203,35 +208,6 @@ void Room::HandleMonsterState(Protocol::S_MONSTER_STATE pkt)
 
 void Room::HandleAttack(Protocol::C_ATTACK pkt)
 {
-	//FVector bulletStartPos = FVector(pkt.start_x(), pkt.start_y(), pkt.start_z());
-	//FVector bulletEndPos = FVector(pkt.end_x(), pkt.end_y(), pkt.end_z());
-
-	//FVector distance = bulletEndPos - bulletStartPos;
-	//float totalDistance = distance.Size();
-
-	//FVector step = distance / totalDistance;
-
-	//for (auto object : _objects)
-	//{
-	//	if (object.second->GetInfo()->creature_type() != Protocol::CREATURE_TYPE_MONSTER)
-	//	{
-	//		continue;
-	//	}
-
-	//	if (HitCheck(object.second, bulletStartPos, bulletEndPos))
-	//	{
-	//		Protocol::S_HIT hitPkt;
-
-	//		hitPkt.set_object_id(object.second->GetInfo()->object_id());
-
-	//		shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(hitPkt);
-	//		Broadcast(sendBuffer);
-
-	//		std::cout << "[Monster Hit] : ObjectID : " << object.second->GetInfo()->object_id() << std::endl;
-	//		break;
-	//	}
-	//}
-
 	//다른 애들한테 공격 했다고 알려주기
 	Protocol::S_ATTACK attackPkt;
 
@@ -277,6 +253,14 @@ void Room::HandleInteract(Protocol::C_INTERACT pkt)
 	if (_mapName == "Hangar")
 	{
 		HangarInteract(pkt);
+	}
+	else if(_mapName == "Demonstration")
+	{
+		DemonstrationInteract(pkt);
+	}
+	else if (_mapName == "Yumin")
+	{
+		YuminInteract(pkt);
 	}
 }
 
@@ -366,15 +350,24 @@ void Room::SpawnMonster(const std::vector<ns::Monster>& infos)
 		if (info.type == "Rush")
 		{
 			destPos = FVector(info.dest_location->x, info.dest_location->y, info.dest_location->z);
-			monster->SetMoveMode(EMoveMode::Rush);
+			monster->SetMoveType(EMonsterMoveType::Rush);
 		}
 		else
 		{
-			monster->SetMoveMode(EMoveMode::Patrol);
+			monster->SetMoveType(EMonsterMoveType::Patrol);
 		}
 
-		//TODO : type 추가
-		monster->SetMoveType(EMoveType::Move);
+		if (info.attack_type == "Punch")
+		{
+			monster->GetInfo()->set_monster_attack_type(Protocol::MONSTER_ATTACK_TYPE_PUNCH);
+			monster->SetAttackType(EMonsterAttackType::Punch);
+		}
+		else
+		{
+			monster->GetInfo()->set_monster_attack_type(Protocol::MONSTER_ATTACK_TYPE_RIFLE);
+			monster->SetAttackType(EMonsterAttackType::Rifle);
+		}
+
 		monster->SetPos(spawnPos);
 		monster->SetDestPos(destPos);
 
@@ -388,6 +381,7 @@ void Room::SpawnMonster(const std::vector<ns::Monster>& infos)
 	}
 
 	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+	cout << "Broadcast SpawnPackets" << endl;
 	Broadcast(sendBuffer);
 }
 
@@ -403,15 +397,23 @@ void Room::SpawnMonster(const ns::Monster& info)
 	if (info.type == "Rush")
 	{
 		destPos = FVector(info.dest_location->x, info.dest_location->y, info.dest_location->z);
-		monster->SetMoveMode(EMoveMode::Rush);
+		monster->SetMoveType(EMonsterMoveType::Rush);
 	}
 	else
 	{
-		monster->SetMoveMode(EMoveMode::Patrol);
+		monster->SetMoveType(EMonsterMoveType::Patrol);
 	}
 
-	//TODO : type 추가
-	monster->SetMoveType(EMoveType::Move);
+	if (info.attack_type == "Punch")
+	{
+		monster->SetAttackType(EMonsterAttackType::Punch);
+	}
+	else
+	{
+		monster->SetAttackType(EMonsterAttackType::Rifle);
+	}
+
+
 	monster->SetPos(spawnPos);
 	monster->SetDestPos(destPos);
 
@@ -425,26 +427,6 @@ void Room::SpawnMonster(const ns::Monster& info)
 
 	shared_ptr<SendBuffer> sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
 	Broadcast(sendBuffer);
-}
-
-bool Room::HitCheck(shared_ptr<Object> targetObject, FVector start, FVector end)
-{
-	float capsuleHalfHeight = 88.0f; // 캡슐 콜라이더의 높이의 절반
-	float capsuleRadius = 34.0f; // 캡슐 콜라이더의 반지름
-
-	FVector ab = FVector(end.X - start.X, end.Y - start.Y, end.Z - start.Z);
-	FVector ac = FVector(targetObject->GetPosVector().X - start.X, targetObject->GetPosVector().Y - start.Y, targetObject->GetPosVector().Z - start.Z);
-	float abLengthSqr = ab.X * ab.X + ab.Y * ab.Y + ab.Z * ab.Z;
-	float abLength = sqrt(abLengthSqr);
-	float t = (ac.X * ab.X + ac.Y * ab.Y + ac.Z * ab.Z) / abLengthSqr;
-
-	t = fmax(0, fmin(1, t));
-
-	FVector closestPoint = FVector(start.X + ab.X * t, start.Y + ab.Y * t, start.Z + ab.Z * t );
-	float distanceToLine = sqrt(pow(targetObject->GetPosVector().X - closestPoint.X, 2) + pow(targetObject->GetPosVector().Y - closestPoint.Y, 2) + pow(targetObject->GetPosVector().Z - closestPoint.Z, 2));
-	float distanceToAxis = sqrt(pow(closestPoint.X - targetObject->GetPosVector().X, 2) + pow(closestPoint.Y - targetObject->GetPosVector().Y, 2) + pow(closestPoint.Z - targetObject->GetPosVector().Z, 2));
-
-	return distanceToLine <= (capsuleRadius * 2) && distanceToAxis <= capsuleHalfHeight;
 }
 
 void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer, uint64 exceptId /*= 0*/)
@@ -464,6 +446,11 @@ void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer, uint64 exceptId /*= 0*/)
 	}
 }
 
+void Room::RoomClear()
+{
+	_objects.clear();
+}
+
 void Room::HangarInteract(Protocol::C_INTERACT pkt)
 {
 	if (pkt.interact_type() == Protocol::INTERACT_NEXT_STEP)
@@ -474,15 +461,11 @@ void Room::HangarInteract(Protocol::C_INTERACT pkt)
 		{
 			DoTimer(5000, [this]()
 				{
-#if _DEBUG
-					std::vector<ns::Monster> monsters = JsonUtil::ParseJson("F:\\S1\\Server\\Hangar.json", _step);
-#else
-					std::vector<ns::Monster> monsters = JsonUtil::ParseJson("Hangar.json", _step);
-#endif
+					//std::vector<ns::Monster> monsters = JsonUtil::ParseJson("Hangar.json", _step);
+					std::vector<ns::Monster> monsters = JsonUtil::ParseJson(_mapName + "_Monster.json", _step);
+
 					uint64 time = 1000;
 					int i = 0;
-
-					Protocol::S_SPAWN spawnPkt;
 
 					for (const auto& info : monsters)
 					{
@@ -509,6 +492,45 @@ void Room::HangarInteract(Protocol::C_INTERACT pkt)
 					auto sendBuffer = ServerPacketHandler::MakeSendBuffer(interactPkt);
 					Broadcast(sendBuffer);
 				});
+		}
+
+		Protocol::S_INTERACT interactPkt;
+
+		interactPkt.set_object_id(pkt.object_id());
+		interactPkt.set_interact_type(Protocol::INTERACT_NEXT_STEP);
+		interactPkt.set_step_id(_step);
+		auto sendBuffer = ServerPacketHandler::MakeSendBuffer(interactPkt);
+		Broadcast(sendBuffer);
+	}
+}
+
+void Room::DemonstrationInteract(Protocol::C_INTERACT pkt)
+{
+	if (pkt.interact_type() == Protocol::INTERACT_NEXT_STEP)
+	{
+		_step += 1;
+
+		Protocol::S_INTERACT interactPkt;
+
+		interactPkt.set_object_id(pkt.object_id());
+		interactPkt.set_interact_type(Protocol::INTERACT_NEXT_STEP);
+		interactPkt.set_step_id(_step);
+		auto sendBuffer = ServerPacketHandler::MakeSendBuffer(interactPkt);
+		Broadcast(sendBuffer);
+	}
+}
+
+void Room::YuminInteract(Protocol::C_INTERACT pkt)
+{
+	if (pkt.interact_type() == Protocol::INTERACT_NEXT_STEP)
+	{
+		_step += 1;
+
+		std::vector<ns::Monster> monsters = JsonUtil::ParseJson(_mapName + "_Monster.json", _step);
+
+		for (const auto& info : monsters)
+		{
+			SpawnMonster(info);
 		}
 
 		Protocol::S_INTERACT interactPkt;

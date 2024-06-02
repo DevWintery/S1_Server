@@ -101,6 +101,32 @@ inline bool CreatureType_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<CreatureType>(
     CreatureType_descriptor(), name, value);
 }
+enum MonsterAttackType : int {
+  MONSTER_ATTACK_TYPE_NONE = 0,
+  MONSTER_ATTACK_TYPE_PUNCH = 1,
+  MONSTER_ATTACK_TYPE_RIFLE = 2,
+  MonsterAttackType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  MonsterAttackType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool MonsterAttackType_IsValid(int value);
+constexpr MonsterAttackType MonsterAttackType_MIN = MONSTER_ATTACK_TYPE_NONE;
+constexpr MonsterAttackType MonsterAttackType_MAX = MONSTER_ATTACK_TYPE_RIFLE;
+constexpr int MonsterAttackType_ARRAYSIZE = MonsterAttackType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MonsterAttackType_descriptor();
+template<typename T>
+inline const std::string& MonsterAttackType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, MonsterAttackType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function MonsterAttackType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    MonsterAttackType_descriptor(), enum_t_value);
+}
+inline bool MonsterAttackType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, MonsterAttackType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<MonsterAttackType>(
+    MonsterAttackType_descriptor(), name, value);
+}
 enum MoveState : int {
   MOVE_STATE_NONE = 0,
   MOVE_STATE_IDLE = 1,
@@ -132,12 +158,14 @@ enum AnimationState : int {
   ANIMATION_STATE_AIM = 1,
   ANIMATION_STATE_RELOAD = 2,
   ANIMATION_STATE_DIE = 3,
+  ANIMATION_STATE_CROUCH = 4,
+  ANIMATION_STATE_STAND = 5,
   AnimationState_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   AnimationState_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool AnimationState_IsValid(int value);
 constexpr AnimationState AnimationState_MIN = ANIMATION_STATE_NONE;
-constexpr AnimationState AnimationState_MAX = ANIMATION_STATE_DIE;
+constexpr AnimationState AnimationState_MAX = ANIMATION_STATE_STAND;
 constexpr int AnimationState_ARRAYSIZE = AnimationState_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* AnimationState_descriptor();
@@ -237,6 +265,11 @@ template <> struct is_proto_enum< ::Protocol::CreatureType> : ::std::true_type {
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::CreatureType>() {
   return ::Protocol::CreatureType_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::MonsterAttackType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::MonsterAttackType>() {
+  return ::Protocol::MonsterAttackType_descriptor();
 }
 template <> struct is_proto_enum< ::Protocol::MoveState> : ::std::true_type {};
 template <>

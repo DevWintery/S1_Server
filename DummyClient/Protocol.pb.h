@@ -269,6 +269,7 @@ class C_ENTER_ROOM final :
 
   enum : int {
     kPlayerNameFieldNumber = 1,
+    kClothesInfoFieldNumber = 2,
   };
   // string player_name = 1;
   void clear_player_name();
@@ -284,6 +285,24 @@ class C_ENTER_ROOM final :
   std::string* _internal_mutable_player_name();
   public:
 
+  // .Protocol.ClothesInfo clothes_info = 2;
+  bool has_clothes_info() const;
+  private:
+  bool _internal_has_clothes_info() const;
+  public:
+  void clear_clothes_info();
+  const ::Protocol::ClothesInfo& clothes_info() const;
+  PROTOBUF_NODISCARD ::Protocol::ClothesInfo* release_clothes_info();
+  ::Protocol::ClothesInfo* mutable_clothes_info();
+  void set_allocated_clothes_info(::Protocol::ClothesInfo* clothes_info);
+  private:
+  const ::Protocol::ClothesInfo& _internal_clothes_info() const;
+  ::Protocol::ClothesInfo* _internal_mutable_clothes_info();
+  public:
+  void unsafe_arena_set_allocated_clothes_info(
+      ::Protocol::ClothesInfo* clothes_info);
+  ::Protocol::ClothesInfo* unsafe_arena_release_clothes_info();
+
   // @@protoc_insertion_point(class_scope:Protocol.C_ENTER_ROOM)
  private:
   class _Internal;
@@ -293,6 +312,7 @@ class C_ENTER_ROOM final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr player_name_;
+    ::Protocol::ClothesInfo* clothes_info_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -3867,6 +3887,91 @@ inline void C_ENTER_ROOM::set_allocated_player_name(std::string* player_name) {
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:Protocol.C_ENTER_ROOM.player_name)
+}
+
+// .Protocol.ClothesInfo clothes_info = 2;
+inline bool C_ENTER_ROOM::_internal_has_clothes_info() const {
+  return this != internal_default_instance() && _impl_.clothes_info_ != nullptr;
+}
+inline bool C_ENTER_ROOM::has_clothes_info() const {
+  return _internal_has_clothes_info();
+}
+inline const ::Protocol::ClothesInfo& C_ENTER_ROOM::_internal_clothes_info() const {
+  const ::Protocol::ClothesInfo* p = _impl_.clothes_info_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Protocol::ClothesInfo&>(
+      ::Protocol::_ClothesInfo_default_instance_);
+}
+inline const ::Protocol::ClothesInfo& C_ENTER_ROOM::clothes_info() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_ENTER_ROOM.clothes_info)
+  return _internal_clothes_info();
+}
+inline void C_ENTER_ROOM::unsafe_arena_set_allocated_clothes_info(
+    ::Protocol::ClothesInfo* clothes_info) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.clothes_info_);
+  }
+  _impl_.clothes_info_ = clothes_info;
+  if (clothes_info) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Protocol.C_ENTER_ROOM.clothes_info)
+}
+inline ::Protocol::ClothesInfo* C_ENTER_ROOM::release_clothes_info() {
+  
+  ::Protocol::ClothesInfo* temp = _impl_.clothes_info_;
+  _impl_.clothes_info_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Protocol::ClothesInfo* C_ENTER_ROOM::unsafe_arena_release_clothes_info() {
+  // @@protoc_insertion_point(field_release:Protocol.C_ENTER_ROOM.clothes_info)
+  
+  ::Protocol::ClothesInfo* temp = _impl_.clothes_info_;
+  _impl_.clothes_info_ = nullptr;
+  return temp;
+}
+inline ::Protocol::ClothesInfo* C_ENTER_ROOM::_internal_mutable_clothes_info() {
+  
+  if (_impl_.clothes_info_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Protocol::ClothesInfo>(GetArenaForAllocation());
+    _impl_.clothes_info_ = p;
+  }
+  return _impl_.clothes_info_;
+}
+inline ::Protocol::ClothesInfo* C_ENTER_ROOM::mutable_clothes_info() {
+  ::Protocol::ClothesInfo* _msg = _internal_mutable_clothes_info();
+  // @@protoc_insertion_point(field_mutable:Protocol.C_ENTER_ROOM.clothes_info)
+  return _msg;
+}
+inline void C_ENTER_ROOM::set_allocated_clothes_info(::Protocol::ClothesInfo* clothes_info) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.clothes_info_);
+  }
+  if (clothes_info) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(clothes_info));
+    if (message_arena != submessage_arena) {
+      clothes_info = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, clothes_info, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.clothes_info_ = clothes_info;
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C_ENTER_ROOM.clothes_info)
 }
 
 // -------------------------------------------------------------------

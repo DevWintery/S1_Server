@@ -17,6 +17,13 @@ enum CreatureType
 	CREATURE_TYPE_NPC = 3;
 }
 
+enum MonsterAttackType
+{
+	MONSTER_ATTACK_TYPE_NONE = 0;
+	MONSTER_ATTACK_TYPE_PUNCH = 1;
+	MONSTER_ATTACK_TYPE_RIFLE = 2;
+}
+
 enum MoveState
 {
 	MOVE_STATE_NONE = 0;
@@ -30,6 +37,8 @@ enum AnimationState
 	ANIMATION_STATE_AIM = 1;
 	ANIMATION_STATE_RELOAD = 2;
 	ANIMATION_STATE_DIE = 3;
+	ANIMATION_STATE_CROUCH = 4;
+	ANIMATION_STATE_STAND = 5;
 }
 
 enum MonsterState

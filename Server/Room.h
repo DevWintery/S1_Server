@@ -16,7 +16,7 @@ public:
 
 public:
 	std::vector<shared_ptr<Object>> GetPlayers();
-
+	const std::string& GetMapName() { return _mapName; }
 public:
 	bool EnterRoom(shared_ptr<Player> player);
 
@@ -31,7 +31,9 @@ public:
 	void HandleAttack(Protocol::C_ATTACK pkt);
 	void HandleServerAttack(Protocol::S_ATTACK pkt, shared_ptr<Object> target);
 	void HandleHit(Protocol::C_HIT pkt);
+
 	void HandleInteract(Protocol::C_INTERACT pkt);
+
 	void HandleAnimationState(Protocol::C_ANIMATION_STATE pkt);
 	void HandleChangeWeapon(Protocol::C_CHANGE_WEAPON pkt);
 
@@ -45,13 +47,14 @@ private:
 	void SpawnMonster(const ns::Monster& info);
 
 private:
-	bool HitCheck(shared_ptr<Object> targetObject, FVector start, FVector end);
-
-private:
 	void Broadcast(shared_ptr<SendBuffer> sendBuffer, uint64 exceptId = 0);
+
+	void RoomClear();
 
 private:
 	void HangarInteract(Protocol::C_INTERACT pkt);
+	void DemonstrationInteract(Protocol::C_INTERACT pkt);
+	void YuminInteract(Protocol::C_INTERACT pkt);
 
 private:
 	unordered_map<uint64, shared_ptr<Object>> _objects;

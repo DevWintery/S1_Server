@@ -17,6 +17,23 @@ bool Handle_C_ENTER_ROOM(SharedPacketSession& session, Protocol::C_ENTER_ROOM& p
 	shared_ptr<Player> player = ObjectUtils::CreatePlayer(static_pointer_cast<GameSession>(session));
 	player->GetInfo()->set_player_name(pkt.player_name());
 
+	Protocol::ClothesInfo* clothesInfo = new Protocol::ClothesInfo();
+	clothesInfo->CopyFrom(pkt.clothes_info());
+	player->GetInfo()->set_allocated_clothes_info(clothesInfo);
+
+	cout << "Equipment Packet" << endl;
+	cout << "Helment: " << clothesInfo->helmet_id() << endl;
+	cout << "Armor: " << clothesInfo->amor_id() << endl;
+	cout << "Belts: " << clothesInfo->belts_id() << endl;
+	cout << "Boots: " << clothesInfo->boots_id() << endl;
+	cout << "Glasses: " << clothesInfo->glasses_id() << endl;
+	cout << "Gloves: " << clothesInfo->gloves_id() << endl;
+	cout << "Jacket: " << clothesInfo->jacket_id() << endl;
+	cout << "Pants: " << clothesInfo->pants_id() << endl;
+	cout << "Mask: " << clothesInfo->mask_id() << endl;
+	cout << "NVD: " << clothesInfo->nvd_id() << endl;
+	cout << "Radio: " << clothesInfo->radio_id() << endl;
+
 	GRoom->DoAsync(&Room::EnterRoom, player);
 
 	return true;

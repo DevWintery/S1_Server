@@ -27,7 +27,24 @@ message ObjectInfo
 	string player_name = 2;
 	ObjectType object_type = 3;
 	CreatureType creature_type = 4;
-	PosInfo pos_info = 5;
+	MonsterAttackType monster_attack_type = 5;
+	PosInfo pos_info = 6;
+	ClothesInfo clothes_info = 7;
+}
+
+message ClothesInfo
+{
+	uint64 helmet_id = 1;
+	uint64 amor_id = 2;
+	uint64 belts_id = 3;
+	uint64 boots_id = 4;
+	uint64 glasses_id = 5;
+	uint64 gloves_id = 6;
+	uint64 jacket_id = 7;
+	uint64 pants_id = 8;
+	uint64 mask_id = 9;
+	uint64 nvd_id = 10;
+	uint64 radio_id = 11;
 }
 
 message Vector3D

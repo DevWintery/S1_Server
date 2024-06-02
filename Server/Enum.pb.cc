@@ -22,7 +22,7 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[6];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[7];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
@@ -35,20 +35,25 @@ const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "CT_TYPE_ENV\020\003*r\n\014CreatureType\022\026\n\022CREATUR"
   "E_TYPE_NONE\020\000\022\030\n\024CREATURE_TYPE_PLAYER\020\001\022"
   "\031\n\025CREATURE_TYPE_MONSTER\020\002\022\025\n\021CREATURE_T"
-  "YPE_NPC\020\003*I\n\tMoveState\022\023\n\017MOVE_STATE_NON"
-  "E\020\000\022\023\n\017MOVE_STATE_IDLE\020\001\022\022\n\016MOVE_STATE_R"
-  "UN\020\002*x\n\016AnimationState\022\030\n\024ANIMATION_STAT"
-  "E_NONE\020\000\022\027\n\023ANIMATION_STATE_AIM\020\001\022\032\n\026ANI"
-  "MATION_STATE_RELOAD\020\002\022\027\n\023ANIMATION_STATE"
-  "_DIE\020\003*o\n\014MonsterState\022\026\n\022MONSTER_STATE_"
-  "IDLE\020\000\022\026\n\022MONSTER_STATE_MOVE\020\001\022\030\n\024MONSTE"
-  "R_STATE_ATTACK\020\002\022\025\n\021MONSTER_STATE_DIE\020\003*"
-  "A\n\014InteractType\022\026\n\022INTERACT_NEXT_STEP\020\000\022"
-  "\031\n\025INTERACT_SPAWN_OBJECT\020\001b\006proto3"
+  "YPE_NPC\020\003*o\n\021MonsterAttackType\022\034\n\030MONSTE"
+  "R_ATTACK_TYPE_NONE\020\000\022\035\n\031MONSTER_ATTACK_T"
+  "YPE_PUNCH\020\001\022\035\n\031MONSTER_ATTACK_TYPE_RIFLE"
+  "\020\002*I\n\tMoveState\022\023\n\017MOVE_STATE_NONE\020\000\022\023\n\017"
+  "MOVE_STATE_IDLE\020\001\022\022\n\016MOVE_STATE_RUN\020\002*\257\001"
+  "\n\016AnimationState\022\030\n\024ANIMATION_STATE_NONE"
+  "\020\000\022\027\n\023ANIMATION_STATE_AIM\020\001\022\032\n\026ANIMATION"
+  "_STATE_RELOAD\020\002\022\027\n\023ANIMATION_STATE_DIE\020\003"
+  "\022\032\n\026ANIMATION_STATE_CROUCH\020\004\022\031\n\025ANIMATIO"
+  "N_STATE_STAND\020\005*o\n\014MonsterState\022\026\n\022MONST"
+  "ER_STATE_IDLE\020\000\022\026\n\022MONSTER_STATE_MOVE\020\001\022"
+  "\030\n\024MONSTER_STATE_ATTACK\020\002\022\025\n\021MONSTER_STA"
+  "TE_DIE\020\003*A\n\014InteractType\022\026\n\022INTERACT_NEX"
+  "T_STEP\020\000\022\031\n\025INTERACT_SPAWN_OBJECT\020\001b\006pro"
+  "to3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 634, descriptor_table_protodef_Enum_2eproto,
+    false, false, 803, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -94,9 +99,24 @@ bool CreatureType_IsValid(int value) {
   }
 }
 
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MoveState_descriptor() {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MonsterAttackType_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
   return file_level_enum_descriptors_Enum_2eproto[2];
+}
+bool MonsterAttackType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MoveState_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[3];
 }
 bool MoveState_IsValid(int value) {
   switch (value) {
@@ -111,7 +131,7 @@ bool MoveState_IsValid(int value) {
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* AnimationState_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
-  return file_level_enum_descriptors_Enum_2eproto[3];
+  return file_level_enum_descriptors_Enum_2eproto[4];
 }
 bool AnimationState_IsValid(int value) {
   switch (value) {
@@ -119,6 +139,8 @@ bool AnimationState_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
+    case 5:
       return true;
     default:
       return false;
@@ -127,7 +149,7 @@ bool AnimationState_IsValid(int value) {
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MonsterState_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
-  return file_level_enum_descriptors_Enum_2eproto[4];
+  return file_level_enum_descriptors_Enum_2eproto[5];
 }
 bool MonsterState_IsValid(int value) {
   switch (value) {
@@ -143,7 +165,7 @@ bool MonsterState_IsValid(int value) {
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* InteractType_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
-  return file_level_enum_descriptors_Enum_2eproto[5];
+  return file_level_enum_descriptors_Enum_2eproto[6];
 }
 bool InteractType_IsValid(int value) {
   switch (value) {
